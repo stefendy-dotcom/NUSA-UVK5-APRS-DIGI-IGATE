@@ -1,0 +1,33 @@
+NUSA UV-K5 APRS DIGI
+Copyright 2026 YF9UAG / NUSA UV-K5 APRS DIGI
+
+This project is a modified/derived work built from the open-source
+Quansheng UV-K5 firmware ecosystem.
+
+Primary upstream base used for this project:
+  bg7nzl/uv-k5-v1-firmware
+  https://github.com/bg7nzl/uv-k5-v1-firmware
+
+That upstream project is itself based on and/or incorporates work from
+projects and contributors including DualTachyon, OneOfEleven, fagci,
+egzumer, and others credited by the upstream repository.
+
+Original open firmware:
+  DualTachyon/uv-k5-firmware
+  https://github.com/DualTachyon/uv-k5-firmware
+
+APRS timing/reference work consulted during REV1G development:
+  phdlee/uvk5cec
+  https://github.com/phdlee/uvk5cec
+
+NUSA UV-K5 APRS DIGI modifications include APRS digipeater behavior,
+Bell 202 / AX.25 work, hardware-timer TX pacing, fixed-position beacon
+features, standalone autostart operation, single-VFO APRS operation,
+and APRFq keypad configuration.
+
+This NOTICE is provided to preserve attribution and project history.
+Nothing in this NOTICE changes the terms of the Apache License 2.0.
+See the LICENSE file for the applicable license terms.
+
+Firmware and documentation are provided WITHOUT WARRANTY, to the extent
+permitted by the Apache License 2.0 and applicable law.
