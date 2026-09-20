@@ -374,17 +374,27 @@ The firmware files provided in this repository use the `.packed.bin` format and 
 
 ### Official Quansheng flash tool
 
-Download the official Quansheng UV-K5/UV-K5(8)/UV-K6 firmware package from:
+Open the official Quansheng support/download page:
 
 **https://en.qsfj.com/support/downloads/3268**
 
-After downloading and extracting the package, run:
+On that page, look for the download entry titled:
+
+```text
+UV-K5(8) Firmware
+```
+
+Download that package, extract the ZIP file, then run:
 
 ```text
 AnonymPSUpdater_Setup_EN.exe
 ```
 
-This installs the **Portable Radio Update Tools** used to flash the UV-K5. The updater executable is supplied inside Quansheng's firmware package; it is not mirrored in this repository.
+This installs the **Portable Radio Update Tools** used to flash the UV-K5.
+
+> The visible download title on the Quansheng page is **UV-K5(8) Firmware**. The ZIP filename itself may be longer and may include UV-K6/version/date information, so look for the title above rather than relying on the ZIP filename.
+
+The updater executable is supplied inside Quansheng's firmware package; it is not mirrored in this repository.
 
 Before flashing:
 
@@ -443,17 +453,27 @@ File firmware pada repository ini menggunakan format `.packed.bin` dan membutuhk
 
 ### Download Flash Tool Resmi Quansheng
 
-Download paket firmware/updater resmi Quansheng UV-K5/UV-K5(8)/UV-K6 dari:
+Buka halaman support/download resmi Quansheng:
 
 **https://en.qsfj.com/support/downloads/3268**
 
-Setelah paket selesai didownload dan diekstrak, jalankan:
+Di halaman tersebut, cari entry download dengan title:
+
+```text
+UV-K5(8) Firmware
+```
+
+Download paket tersebut, extract file ZIP, lalu jalankan:
 
 ```text
 AnonymPSUpdater_Setup_EN.exe
 ```
 
-File tersebut akan menginstal **Portable Radio Update Tools** yang digunakan untuk melakukan flashing UV-K5. Installer updater disediakan di dalam paket firmware Quansheng dan tidak di-host ulang di repository ini.
+File tersebut akan menginstal **Portable Radio Update Tools** yang digunakan untuk melakukan flashing UV-K5.
+
+> Title yang terlihat di halaman Quansheng adalah **UV-K5(8) Firmware**. Nama file ZIP yang didownload bisa lebih panjang dan dapat mencantumkan UV-K6/versi/tanggal, jadi gunakan title di atas sebagai acuan.
+
+Installer updater disediakan di dalam paket firmware Quansheng dan tidak di-host ulang di repository ini.
 
 Sebelum melakukan flashing:
 
