@@ -130,6 +130,13 @@ VFO B tetap ada dalam struktur internal firmware, tetapi tidak dipilih saat APRS
 
 ## Beacon Posisi
 
+TOCALL beacon posisi pada REV1G Normal dan Standalone:
+
+```text
+APZUAG
+```
+
+
 Beacon otomatis:
 
 ```text
