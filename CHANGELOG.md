@@ -9,6 +9,7 @@
 - WIDE2 n-N digipeater support.
 - Duplicate suppression approximately 20 seconds.
 - Fixed/manual position beacon.
+- Position beacon TOCALL changed from `APRS` to `APZUAG` for REV1G Normal and Standalone.
 - Manual `*` beacon.
 - APRS weak-RX configuration.
 - SoundModem RF decode confirmed in field testing.
