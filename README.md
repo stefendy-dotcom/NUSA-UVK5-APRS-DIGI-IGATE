@@ -372,6 +372,20 @@ Red LED   = APRS TX
 
 The firmware files provided in this repository use the `.packed.bin` format and require a **Quansheng UV-K5 compatible firmware updater**.
 
+### Official Quansheng flash tool
+
+Download the official Quansheng UV-K5/UV-K5(8)/UV-K6 firmware package from:
+
+**https://en.qsfj.com/support/downloads/3268**
+
+After downloading and extracting the package, run:
+
+```text
+AnonymPSUpdater_Setup_EN.exe
+```
+
+This installs the **Portable Radio Update Tools** used to flash the UV-K5. The updater executable is supplied inside Quansheng's firmware package; it is not mirrored in this repository.
+
 Before flashing:
 
 - Use a reliable USB programming cable.
@@ -426,6 +440,20 @@ Then:
 ## Bahasa Indonesia
 
 File firmware pada repository ini menggunakan format `.packed.bin` dan membutuhkan **software firmware updater yang kompatibel dengan Quansheng UV-K5**.
+
+### Download Flash Tool Resmi Quansheng
+
+Download paket firmware/updater resmi Quansheng UV-K5/UV-K5(8)/UV-K6 dari:
+
+**https://en.qsfj.com/support/downloads/3268**
+
+Setelah paket selesai didownload dan diekstrak, jalankan:
+
+```text
+AnonymPSUpdater_Setup_EN.exe
+```
+
+File tersebut akan menginstal **Portable Radio Update Tools** yang digunakan untuk melakukan flashing UV-K5. Installer updater disediakan di dalam paket firmware Quansheng dan tidak di-host ulang di repository ini.
 
 Sebelum melakukan flashing:
 
