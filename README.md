@@ -388,7 +388,7 @@ NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
 
 Follow the instructions provided by the UV-K5 firmware updater you choose.
 
-> **Note:** Firmware flashing/updater software is not developed or maintained as part of the NUSA UV-K5 APRS DIGI project. Obtain updater software from its original or another trusted distribution source.
+> **Note:** Firmware flashing/updater software is not developed or maintained as part of the NUSA UV-K5 APRS DIGI project. This repository intentionally does **not** redistribute third-party updater installers. Obtain the updater from the original vendor or another trusted distribution source. Quansheng support: https://en.qsfj.com/support/downloads/3268
 
 Flash the:
 
@@ -443,7 +443,7 @@ NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
 
 Ikuti prosedur yang diberikan oleh software firmware updater UV-K5 yang digunakan.
 
-> **Catatan:** Software flashing/updater bukan dikembangkan atau dipelihara sebagai bagian dari proyek NUSA UV-K5 APRS DIGI. Disarankan memperoleh software updater dari sumber asli atau sumber terpercaya.
+> **Catatan:** Software flashing/updater bukan dikembangkan atau dipelihara sebagai bagian dari proyek NUSA UV-K5 APRS DIGI. Repository ini sengaja **tidak mendistribusikan installer updater pihak ketiga**. Ambil updater dari vendor asli atau sumber lain yang benar-benar terpercaya. Dukungan Quansheng: https://en.qsfj.com/support/downloads/3268
 
 Untuk flashing gunakan file:
 
