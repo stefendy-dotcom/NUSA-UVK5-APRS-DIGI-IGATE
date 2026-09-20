@@ -34,6 +34,14 @@ Recommended firmware filenames:
 firmware/
 ├── NUSA_UVK5_APRS_DIGI_REV1G.packed.bin
 └── NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
+
+Current APZUAG beacon builds:
+
+```text
+REV1G SHA256       : b0d4331021a74450aca2aac70925a1e8b8aa04d4247bcc697d7f8225711128c8
+Standalone SHA256  : 70202070d8373dc4a383800cc1bfd6cf4e6aae79cc73e52efc7828484fd48813
+Beacon TOCALL      : APZUAG
+```
 ```
 
 ---
@@ -291,7 +299,7 @@ The firmware converts the coordinates to APRS `DDMM.mm` / `DDDMM.mm` format.
 ## Beacon format
 
 ```text
-Destination : APRS
+Destination : APZUAG
 Path        : WIDE2-1
 Symbol      : #
 Comment     : NUSA DIGI
@@ -300,7 +308,7 @@ Comment     : NUSA DIGI
 Example:
 
 ```text
-YF9UAG-3>APRS,WIDE2-1:!0233.09S/14042.61E#NUSA DIGI
+YF9UAG-3>APZUAG,WIDE2-1:!0233.09S/14042.61E#NUSA DIGI
 ```
 
 ---
