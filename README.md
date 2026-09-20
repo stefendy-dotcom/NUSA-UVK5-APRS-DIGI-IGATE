@@ -366,9 +366,29 @@ Red LED   = APRS TX
 
 ---
 
-# Flashing
+# Flashing / Cara Flash
 
-Use a UV-K5 compatible firmware updater.
+## English
+
+The firmware files provided in this repository use the `.packed.bin` format and require a **Quansheng UV-K5 compatible firmware updater**.
+
+Before flashing:
+
+- Use a reliable USB programming cable.
+- Make sure the radio battery has sufficient charge.
+- Use a firmware updater that supports Quansheng UV-K5 `.packed.bin` files.
+- Keep a known-good firmware available for recovery.
+
+Choose the firmware you want to install:
+
+```text
+NUSA_UVK5_APRS_DIGI_REV1G.packed.bin
+NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
+```
+
+Follow the instructions provided by the UV-K5 firmware updater you choose.
+
+> **Note:** Firmware flashing/updater software is not developed or maintained as part of the NUSA UV-K5 APRS DIGI project. Obtain updater software from its original or another trusted distribution source.
 
 Flash the:
 
@@ -380,7 +400,9 @@ file.
 
 Do **not** flash a `.raw.bin` file unless you specifically know why it is needed.
 
-For the standalone build, recommended first setup:
+Do not disconnect the programming cable, turn the radio off, or remove power while firmware is being written.
+
+### Recommended first setup for REV1G Standalone
 
 ```text
 APRFq  = local APRS frequency
@@ -395,8 +417,62 @@ Then:
 
 1. Power-cycle the UV-K5.
 2. Do not press any APRS activation key.
-3. Transmit from another APRS station using `WIDE2-1` or `WIDE2-2`.
-4. Monitor the output with SoundModem, Dire Wolf, another APRS radio/TNC, or an SDR receiver.
+3. Confirm that APRS starts automatically.
+4. Transmit from another APRS station using `WIDE2-1` or `WIDE2-2`.
+5. Monitor the output with SoundModem, Dire Wolf, another APRS radio/TNC, or an SDR receiver.
+
+---
+
+## Bahasa Indonesia
+
+File firmware pada repository ini menggunakan format `.packed.bin` dan membutuhkan **software firmware updater yang kompatibel dengan Quansheng UV-K5**.
+
+Sebelum melakukan flashing:
+
+- Gunakan kabel programming USB yang baik dan stabil.
+- Pastikan baterai radio memiliki daya yang cukup.
+- Gunakan firmware updater yang mendukung file `.packed.bin` Quansheng UV-K5.
+- Simpan firmware yang diketahui bekerja dengan baik untuk keperluan recovery.
+
+Pilih firmware yang ingin dipasang:
+
+```text
+NUSA_UVK5_APRS_DIGI_REV1G.packed.bin
+NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
+```
+
+Ikuti prosedur yang diberikan oleh software firmware updater UV-K5 yang digunakan.
+
+> **Catatan:** Software flashing/updater bukan dikembangkan atau dipelihara sebagai bagian dari proyek NUSA UV-K5 APRS DIGI. Disarankan memperoleh software updater dari sumber asli atau sumber terpercaya.
+
+Untuk flashing gunakan file:
+
+```text
+*.packed.bin
+```
+
+Jangan flash file `.raw.bin` kecuali benar-benar memahami kegunaannya.
+
+Jangan mencabut kabel programming, mematikan radio, atau memutus daya selama proses penulisan firmware sedang berlangsung.
+
+### Konfigurasi awal yang disarankan untuk REV1G Standalone
+
+```text
+APRFq  = frekuensi APRS setempat
+DgCall = CALLSIGN
+DgSSID = SSID yang diinginkan
+DgDly  = 900 ms
+DgTail = 60 ms
+PosBcn = OFF
+```
+
+Setelah itu:
+
+1. Matikan lalu hidupkan kembali UV-K5.
+2. Jangan menekan tombol aktivasi APRS.
+3. Pastikan APRS aktif otomatis.
+4. Kirim packet dari stasiun APRS lain menggunakan `WIDE2-1` atau `WIDE2-2`.
+5. Pantau hasilnya menggunakan SoundModem, Dire Wolf, radio/TNC APRS lain, atau SDR receiver.
 
 ---
 
