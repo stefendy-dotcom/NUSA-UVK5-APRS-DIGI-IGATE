@@ -388,7 +388,7 @@ NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
 
 Follow the instructions provided by the UV-K5 firmware updater you choose.
 
-> **Note:** Firmware flashing/updater software is not developed or maintained as part of the NUSA UV-K5 APRS DIGI project. This repository intentionally does **not** redistribute third-party updater installers. Obtain the updater from the original vendor or another trusted distribution source. Quansheng support: https://en.qsfj.com/support/downloads/3268
+> **Updater licensing note:** Quansheng distributes its UV-K5 firmware updater through the manufacturer's support/download package. However, this project has not found an explicit license or written permission authorizing third-party redistribution of the updater installer. For that reason, NUSA UV-K5 APRS DIGI does **not** mirror or bundle the updater executable and instead directs users to the original manufacturer source. This is a licensing/distribution precaution, not a statement that the updater is unsafe. Official Quansheng support/downloads: https://en.qsfj.com/support/downloads/3268
 
 Flash the:
 
@@ -443,7 +443,7 @@ NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
 
 Ikuti prosedur yang diberikan oleh software firmware updater UV-K5 yang digunakan.
 
-> **Catatan:** Software flashing/updater bukan dikembangkan atau dipelihara sebagai bagian dari proyek NUSA UV-K5 APRS DIGI. Repository ini sengaja **tidak mendistribusikan installer updater pihak ketiga**. Ambil updater dari vendor asli atau sumber lain yang benar-benar terpercaya. Dukungan Quansheng: https://en.qsfj.com/support/downloads/3268
+> **Catatan lisensi updater:** Quansheng mendistribusikan firmware updater UV-K5 melalui paket support/download dari pabrikan. Namun proyek ini belum menemukan lisensi eksplisit atau izin tertulis yang membolehkan pihak ketiga mendistribusikan ulang installer updater tersebut. Karena itu NUSA UV-K5 APRS DIGI **tidak meng-host ulang atau membundel file installer updater** dan mengarahkan pengguna ke sumber asli pabrikan. Ini adalah langkah kehati-hatian terkait lisensi/distribusi, bukan pernyataan bahwa updater tersebut tidak aman. Support/download resmi Quansheng: https://en.qsfj.com/support/downloads/3268
 
 Untuk flashing gunakan file:
 
