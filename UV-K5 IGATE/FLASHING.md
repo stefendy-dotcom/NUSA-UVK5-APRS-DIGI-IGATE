@@ -1,31 +1,41 @@
 # Flashing Guide — NUSA UV-K5 iGATE REV1A
 
-This guide covers the UV-K5 firmware and the ESP32 **4-BIN ZIP package**.
+This guide covers both UV-K5 firmware variants and the ESP32 **4-BIN ZIP package**.
 
-# 1. UV-K5 firmware
+# 1. Choose UV-K5 firmware
 
-Use:
+## Normal / manual-start
 
 ```text
 firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
 ```
 
-Flash it with a Quansheng UV-K5 compatible updater that supports `.packed.bin`.
+Use this when you want normal HT operation after power-on and enter APRS/iGate manually, normally with Long F2.
+
+## Standalone / autostart
+
+```text
+firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
+```
+
+Use this for a dedicated iGate. After normal boot initialization it automatically locks runtime to VFO A and enters APRS/iGate.
+
+Before flashing either UV-K5 firmware:
+
+- Charge the battery sufficiently.
+- Use a known-good programming cable.
+- Keep recovery firmware available.
+- Do not disconnect the cable or remove power while writing.
+
+Use a Quansheng UV-K5 compatible updater that supports `.packed.bin`.
 
 Official Quansheng support/download page:
 
 https://en.qsfj.com/support/downloads/3268
 
-Before flashing:
+For Standalone, set the desired APRS frequency on **VFO A before flashing or before the next reboot into standalone operation**. Standalone uses the stored VFO-A RX frequency and forces simplex APRS runtime.
 
-- Charge the UV-K5 battery sufficiently.
-- Use a known-good programming cable.
-- Keep a recovery firmware available.
-- Do not disconnect the cable or remove power while writing.
-
-After flashing, power the radio normally, select the intended APRS VFO/frequency and enter APRS/iGate mode, normally Long F2.
-
-# 2. ESP32 package
+# 2. ESP32 package — same for Normal and Standalone
 
 Download:
 
@@ -33,7 +43,7 @@ Download:
 esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip
 ```
 
-Extract it. The ZIP contains exactly four files:
+Extract it. The ZIP contains:
 
 ```text
 NUSA_UVK5_ESP32_IGATE_REV1A_bootloader.bin
@@ -42,7 +52,7 @@ NUSA_UVK5_ESP32_IGATE_REV1A_boot_app0.bin
 NUSA_UVK5_ESP32_IGATE_REV1A_firmware.bin
 ```
 
-Use these offsets:
+Flash offsets:
 
 ```text
 0x1000  NUSA_UVK5_ESP32_IGATE_REV1A_bootloader.bin
@@ -51,25 +61,13 @@ Use these offsets:
 0x10000 NUSA_UVK5_ESP32_IGATE_REV1A_firmware.bin
 ```
 
-The package was built with Arduino-ESP32 core 3.3.11 for classic ESP32 Dev Module / ESP32-WROOM-32 class hardware.
+The ESP32 package was built with Arduino-ESP32 core 3.3.11 for classic ESP32 Dev Module / ESP32-WROOM-32 class hardware.
 
-## Flash with esptool
-
-Install esptool if required:
-
-```text
-python -m pip install esptool
-```
-
-Erase first:
+## esptool example
 
 ```text
 python -m esptool --chip esp32 --port COM5 --baud 460800 erase-flash
-```
 
-Then flash all four files in one command:
-
-```text
 python -m esptool --chip esp32 --port COM5 --baud 460800 write-flash \
   0x1000  NUSA_UVK5_ESP32_IGATE_REV1A_bootloader.bin \
   0x8000  NUSA_UVK5_ESP32_IGATE_REV1A_partitions.bin \
@@ -77,13 +75,9 @@ python -m esptool --chip esp32 --port COM5 --baud 460800 write-flash \
   0x10000 NUSA_UVK5_ESP32_IGATE_REV1A_firmware.bin
 ```
 
-Replace `COM5` with the actual ESP32 serial port.
+Replace `COM5` with the actual serial port.
 
-Linux example: use `/dev/ttyUSB0` or the correct device instead of COM5.
-
-If automatic download mode does not work, hold **BOOT**, tap **EN/RESET**, start flashing, then release BOOT when writing begins.
-
-After flashing and resetting:
+After reset:
 
 ```text
 SSID     : NUSA-IGATE
@@ -91,49 +85,37 @@ Password : 12345678
 Web      : http://192.168.4.1/
 ```
 
-# 3. ESP32 Flash Download Tool
+# 3. Bahasa Indonesia — pilih firmware UV-K5
 
-If using Espressif's graphical Flash Download Tool, add four rows:
-
-```text
-0x1000  bootloader.bin
-0x8000  partitions.bin
-0xE000  boot_app0.bin
-0x10000 firmware.bin
-```
-
-Select the corresponding NUSA filenames from the extracted ZIP.
-
-# 4. Bahasa Indonesia — UV-K5
-
-Gunakan:
+## Normal
 
 ```text
 firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
 ```
 
-Flash menggunakan updater Quansheng UV-K5 yang mendukung `.packed.bin`.
+Setelah power-on radio tetap normal. Masuk APRS/iGate secara manual, biasanya Long F2.
 
-Pastikan baterai cukup, kabel programming baik, dan jangan memutus daya selama proses flash.
+## Standalone
 
-# 5. Bahasa Indonesia — ESP32
+```text
+firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
+```
 
-Download dan extract:
+Digunakan untuk iGate dedicated. Setelah boot, firmware otomatis menggunakan VFO A dan masuk APRS/iGate.
+
+Sebelum menggunakan Standalone, set frekuensi APRS yang diinginkan pada **VFO A**. Standalone memakai frekuensi RX VFO A yang tersimpan dan memaksa APRS simplex saat runtime.
+
+# 4. Bahasa Indonesia — ESP32
+
+Firmware ESP32 **sama** untuk Normal dan Standalone.
+
+Extract:
 
 ```text
 esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip
 ```
 
-Di dalam ZIP ada tepat empat file `.bin`:
-
-```text
-NUSA_UVK5_ESP32_IGATE_REV1A_bootloader.bin
-NUSA_UVK5_ESP32_IGATE_REV1A_partitions.bin
-NUSA_UVK5_ESP32_IGATE_REV1A_boot_app0.bin
-NUSA_UVK5_ESP32_IGATE_REV1A_firmware.bin
-```
-
-Masukkan address berikut dengan benar:
+Gunakan address:
 
 ```text
 0x1000  bootloader
@@ -142,19 +124,7 @@ Masukkan address berikut dengan benar:
 0x10000 firmware
 ```
 
-Contoh esptool:
-
-```text
-python -m esptool --chip esp32 --port COM5 --baud 460800 erase-flash
-
-python -m esptool --chip esp32 --port COM5 --baud 460800 write-flash \
-  0x1000  NUSA_UVK5_ESP32_IGATE_REV1A_bootloader.bin \
-  0x8000  NUSA_UVK5_ESP32_IGATE_REV1A_partitions.bin \
-  0xE000  NUSA_UVK5_ESP32_IGATE_REV1A_boot_app0.bin \
-  0x10000 NUSA_UVK5_ESP32_IGATE_REV1A_firmware.bin
-```
-
-Setelah selesai, reset ESP32 kemudian hubungkan ke:
+Setelah flash dan reset:
 
 ```text
 SSID     : NUSA-IGATE
@@ -162,6 +132,6 @@ Password : 12345678
 Web      : http://192.168.4.1/
 ```
 
-# 6. Verify downloads
+# 5. Verify downloads
 
-Compare the downloaded package hash with `SHA256SUMS.txt` before flashing.
+Compare SHA256 values with `SHA256SUMS.txt` before flashing.
