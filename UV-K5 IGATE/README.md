@@ -1,5 +1,7 @@
 # NUSA UV-K5 iGATE REV1A
 
+[![iGate REV1A Downloads](https://img.shields.io/github/downloads/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/igate-rev1a/total?style=for-the-badge&logo=github&label=iGate%20REV1A%20Downloads)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
+
 **NUSA UV-K5 iGATE REV1A** turns a Quansheng UV-K5/UV-5K into the RF modem/radio side of a Wi-Fi APRS iGate. An ESP32 DevKit/WROOM-32 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
 
 Two UV-K5 firmware variants are provided:
