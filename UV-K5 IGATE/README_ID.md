@@ -9,6 +9,10 @@ Tersedia dua varian firmware UV-K5:
 
 Kedua varian menggunakan **firmware ESP32 dan protokol UART yang sama**.
 
+## Diagram Koneksi
+
+![Diagram Koneksi NUSA UV-K5 iGATE](Connection%20Diagram.webp)
+
 ## Arsitektur
 
 ```text
