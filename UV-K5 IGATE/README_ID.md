@@ -1,8 +1,13 @@
 # NUSA UV-K5 iGATE REV1A — Bahasa Indonesia
 
-**NUSA UV-K5 iGATE REV1A** menjadikan Quansheng UV-K5/UV-5K sebagai sisi radio/modem RF untuk APRS iGate. ESP32 DevKit/WROOM-32 menangani Wi-Fi, APRS-IS, filter message, dan dashboard web.
+**NUSA UV-K5 iGATE REV1A** menjadikan Quansheng UV-K5/UV-5K sebagai sisi radio/modem RF untuk APRS iGate. ESP32 DevKit/WROOM-32 menangani Wi-Fi, APRS-IS, filtering, dan dashboard web.
 
-REV1A adalah versi **normal / manual-start**. Setelah radio dinyalakan, UV-K5 masih dapat bekerja sebagai HT biasa. Masuk ke layar APRS/iGate menggunakan action APRS, biasanya **Long F2**.
+Tersedia dua varian firmware UV-K5:
+
+1. **REV1A Normal** — APRS/iGate masuk secara manual, biasanya Long F2.
+2. **REV1A Standalone** — mode iGate dedicated aktif otomatis setelah radio dinyalakan.
+
+Kedua varian menggunakan **firmware ESP32 dan protokol UART yang sama**.
 
 ## Arsitektur
 
@@ -11,7 +16,7 @@ Stasiun APRS RF
       |
       v
 Quansheng UV-K5
-Decode Bell 202 / AX.25
+Bell 202 / AX.25
       |
       | UART 38400 8N1
       v
@@ -22,7 +27,7 @@ ESP32 DevKit / WROOM-32
 APRS-IS
 ```
 
-Jalur balik:
+Jalur balik untuk APRS message:
 
 ```text
 APRS-IS message
@@ -38,45 +43,103 @@ UV-K5 Bell 202 TX
 Stasiun RF lokal
 ```
 
+## Varian firmware
+
+| Fungsi | REV1A Normal | REV1A Standalone |
+|---|---|---|
+| Start APRS/iGate | Manual, biasanya Long F2 | Otomatis saat power-on |
+| VFO yang digunakan | VFO yang dipilih saat masuk APRS | VFO A |
+| Dual Watch saat APRS | OFF | OFF |
+| Cross Band | Normal di luar APRS | OFF saat standalone |
+| Voice PTT saat APRS | Diblokir | Diblokir |
+| EXIT dari APRS | Keluar APRS | Tidak mematikan iGate |
+| MENU dari APRS | Mengikuti alur radio normal | Membuka menu konfigurasi |
+| Protokol UART | 38400 8N1 | Sama |
+| Firmware ESP32 | Sama | Sama |
+| RF -> APRS-IS | Sama | Sama |
+| APRS-IS -> RF message | Sama | Sama |
+
+### REV1A Normal
+
+Firmware:
+
+```text
+firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
+```
+
+Pilih VFO/frekuensi APRS, kemudian masuk APRS/iGate secara manual.
+
+### REV1A Standalone
+
+Firmware:
+
+```text
+firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
+```
+
+Alur standalone:
+
+```text
+POWER ON
+   |
+   v
+Load EEPROM / VFO
+   |
+   v
+Paksa VFO A
+Dual Watch OFF
+Cross Band OFF
+   |
+   v
+Gunakan frekuensi RX VFO A yang tersimpan
+Paksa APRS simplex saat runtime
+   |
+   v
+Masuk APRS/iGate otomatis
+   |
+   v
+IGATE ACTIVE
+```
+
+Standalone mempertahankan engine Bell-202, AX.25, UART framing, RF -> APRS-IS, serta queue IS -> RF yang sama dengan REV1A Normal.
+
+**ESP32 tidak perlu firmware berbeda.**
+
 ## Fitur utama
 
-- Firmware iGate APRS khusus UV-K5.
-- Bell 202 / AX.25 1200 baud berjalan langsung di firmware UV-K5.
-- ESP32 menghubungkan UV-K5 ke APRS-IS melalui Wi-Fi.
-- Gating RF -> APRS-IS untuk packet direct/indirect.
-- APRS-IS -> RF dibatasi **hanya APRS message**.
-- Target IS -> RF harus terdengar **DIRECT melalui RF dalam 30 menit terakhir**.
+- Bell 202 / AX.25 APRS 1200 baud.
+- RF -> APRS-IS gating.
+- APRS-IS -> RF dibatasi APRS message.
+- Target IS -> RF harus terdengar DIRECT melalui RF dalam 30 menit terakhir.
 - Callsign + SSID target harus cocok tepat.
-- Proteksi loop untuk NOGATE, RFONLY, TCPXX, Internet-heard station, duplicate dan third-party.
-- Dashboard web: `http://192.168.4.1/`.
+- Anti-loop untuk NOGATE, RFONLY, TCPXX, Internet-heard station, duplicate dan third-party.
+- Dashboard: `http://192.168.4.1/`.
 - AP default: `NUSA-IGATE` / `12345678`.
 - UART: **38400 baud, 8N1**.
 - TOCALL beacon posisi: `APZUAG`.
-- Path posisi: `WIDE2-1`.
-- Comment posisi: `NUSA IGATE`.
-- Dual Watch dimatikan saat APRS aktif agar packet tidak terpotong karena perpindahan VFO.
+- Path: `WIDE2-1`.
+- Comment: `NUSA IGATE`.
 
 ## Status pengujian
 
-- Firmware UV-K5: compile sudah diverifikasi.
-- UV-K5 `.packed.bin`: CRC packed sudah diverifikasi.
-- Paket binary ESP32: compile berhasil menggunakan **Arduino-ESP32 core 3.3.11**, target `esp32:esp32:esp32`.
+- REV1A Normal UV-K5: compile dan packed CRC sudah diverifikasi.
 - Interface UART yang sudah dikoreksi: **sudah berhasil diuji pada hardware nyata**.
-- RF -> ESP32 -> APRS-IS: **sudah berhasil diuji pada hardware nyata**.
+- REV1A Normal RF -> ESP32 -> APRS-IS: **sudah berhasil diuji pada hardware nyata**.
+- REV1A Standalone UV-K5: **compile dan packed CRC sudah diverifikasi**.
+- REV1A Standalone: **belum diuji pada hardware nyata**.
 - APRS-IS -> RF message: sudah diimplementasikan, masih menunggu pengujian on-air.
 
 ## File rilis
 
 ```text
 firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
+firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
 esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip
 FLASHING.md
 SHA256SUMS.txt
 ```
 
-ESP32 diberikan sebagai paket ZIP hasil compile yang berisi tepat empat file binary.
-
-Setelah extract `NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip`:
+ZIP ESP32 berisi tepat empat file binary:
 
 ```text
 NUSA_UVK5_ESP32_IGATE_REV1A_bootloader.bin
@@ -85,16 +148,7 @@ NUSA_UVK5_ESP32_IGATE_REV1A_boot_app0.bin
 NUSA_UVK5_ESP32_IGATE_REV1A_firmware.bin
 ```
 
-Address flash:
-
-```text
-0x1000  bootloader
-0x8000  partitions
-0xE000  boot_app0
-0x10000 firmware
-```
-
-Baca **[FLASHING.md](FLASHING.md)** untuk prosedur lengkap.
+Baca **[FLASHING.md](FLASHING.md)** untuk address ESP32 dan prosedur flash UV-K5.
 
 ## Koneksi UART
 
@@ -114,17 +168,6 @@ UV-K5 3.5 mm TIP  = radio V+
 
 **TIP 3.5 mm membawa tegangan radio. Jangan dihubungkan ke GPIO atau GND ESP32.**
 
-## Cara penggunaan dasar
-
-1. Set frekuensi APRS pada VFO UV-K5 yang digunakan iGate.
-2. Masuk layar APRS/iGate, biasanya Long F2.
-3. Nyalakan ESP32 dan hubungkan ke AP `NUSA-IGATE`.
-4. Buka `http://192.168.4.1/`, isi Wi-Fi, callsign/SSID iGate dan APRS-IS.
-5. Pastikan Wi-Fi connected dan APRS-IS menunjukkan `VERIFIED`.
-6. Kirim packet APRS dari stasiun RF lain.
-7. Pastikan UV-K5 decode dan counter **RF -> APRS-IS** meningkat.
-8. Pastikan packet masuk APRS-IS.
-
 ## Credit
 
 ```text
@@ -135,4 +178,4 @@ Indonesia
 
 ## Keselamatan dan regulasi
 
-Verifikasi wiring menggunakan multimeter sebelum memberikan daya. Jangan mengandalkan warna kabel untuk menentukan TIP/RING/SLEEVE. Operator bertanggung jawab terhadap frekuensi, power, callsign dan operasi unattended sesuai regulasi yang berlaku.
+Verifikasi wiring menggunakan multimeter sebelum memberikan daya. Jangan mengandalkan warna kabel untuk menentukan TIP/RING/SLEEVE. Operator bertanggung jawab terhadap frekuensi, power, callsign dan operasi unattended sesuai regulasi.
