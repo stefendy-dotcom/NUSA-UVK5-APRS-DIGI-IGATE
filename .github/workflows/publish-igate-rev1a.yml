@@ -25,12 +25,10 @@ jobs:
           BASE="https://map.aprsid.com/static/nusa-uvk5-igate-rev1a"
           mkdir -p "UV-K5 IGATE/firmware" "UV-K5 IGATE/esp32"
 
-          # Remove older ESP32 distribution forms.
-          rm -f "UV-K5 IGATE/esp32/NUSA_UVK5_ESP32_IGATE_REV1A.ino"
-          rm -f "UV-K5 IGATE/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_APP.bin"
-          rm -f "UV-K5 IGATE/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_FULL.bin"
-
           curl -fL "$BASE/NUSA_UVK5_IGATE_REV1A.packed.bin"             -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin"             -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin"
+
           curl -fL "$BASE/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip"             -o "UV-K5 IGATE/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip"
 
       - name: Verify SHA256
@@ -38,10 +36,12 @@ jobs:
         run: |
           set -euo pipefail
           echo "b35d323e99ff9ec9e216c00bccdafe938fd6f17d132065696bb48dc3c20c842e  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin" | sha256sum -c -
+          echo "be97c352f1b0a48081b4bfdf78791f088439627d69b8ad7d75f0042720d92253  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin" | sha256sum -c -
           echo "cedb74e3bae16b0789b4135c966049a61c8944219ababb0da35dc8d7aace6fcc  UV-K5 IGATE/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip" | sha256sum -c -
+
           (
             cd "UV-K5 IGATE"
-            sha256sum firmware/NUSA_UVK5_IGATE_REV1A.packed.bin                       esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip > SHA256SUMS.txt
+            sha256sum               firmware/NUSA_UVK5_IGATE_REV1A.packed.bin               firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin               esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip               > SHA256SUMS.txt
           )
 
       - name: Commit release artifacts
@@ -52,7 +52,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A "UV-K5 IGATE/firmware" "UV-K5 IGATE/esp32" "UV-K5 IGATE/SHA256SUMS.txt"
           if ! git diff --cached --quiet; then
-            git commit -m "Publish ESP32 iGate REV1A four-BIN ZIP"
+            git commit -m "Publish UV-K5 iGate REV1A Standalone firmware"
             git push
           fi
 
@@ -74,4 +74,4 @@ jobs:
           git tag -f "$TAG" "$HEAD_SHA"
           git push origin "refs/tags/$TAG" --force
 
-          gh release create "$TAG"             "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin"             "UV-K5 IGATE/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip"             "UV-K5 IGATE/SHA256SUMS.txt"             --title "$TITLE"             --notes "NUSA UV-K5 iGATE REV1A. UV-K5 packed firmware plus ESP32 compiled four-BIN ZIP package. No ESP32 .ino source file is distributed in this release. RF to APRS-IS has been field-tested. IS to RF APRS message gating is implemented and remains pending on-air validation. See UV-K5 IGATE/README.md, README_ID.md and FLASHING.md."
+          gh release create "$TAG"             "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin"             "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin"             "UV-K5 IGATE/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip"             "UV-K5 IGATE/SHA256SUMS.txt"             --title "$TITLE"             --notes "NUSA UV-K5 iGATE REV1A Normal and Standalone. Both UV-K5 variants use the same ESP32 four-BIN package and the same UART protocol. Normal RF to APRS-IS has been field-tested. Standalone is compile/CRC verified and awaits hardware field testing. See UV-K5 IGATE/README.md, README_ID.md and FLASHING.md."
