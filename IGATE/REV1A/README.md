@@ -74,7 +74,7 @@ FLASHING.md
 SHA256SUMS.txt
 ```
 
-The ESP32 source `.ino` is **not distributed** in this release. The ESP32 is supplied as a compiled ZIP package containing exactly four binary files.
+The ESP32 is supplied as a compiled ZIP package containing exactly four binary files.
 
 After extracting `NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip`:
 
