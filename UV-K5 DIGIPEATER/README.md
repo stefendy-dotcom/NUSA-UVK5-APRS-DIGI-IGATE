@@ -1,5 +1,7 @@
 # NUSA UV-K5 APRS Digipeater
 
+[![REV1G Downloads](https://img.shields.io/github/downloads/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/rev1g/total?style=for-the-badge&logo=github&label=REV1G%20Downloads)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g)
+
 Custom APRS digipeater firmware for the **Quansheng UV-K5**, developed and field-tested for Bell 202 / AX.25 APRS operation.
 
 This first public release contains two firmware variants:
