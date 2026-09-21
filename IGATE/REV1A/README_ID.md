@@ -74,7 +74,7 @@ FLASHING.md
 SHA256SUMS.txt
 ```
 
-Source ESP32 `.ino` **tidak didistribusikan** pada rilis ini. ESP32 diberikan sebagai paket ZIP hasil compile yang berisi tepat empat file binary.
+ESP32 diberikan sebagai paket ZIP hasil compile yang berisi tepat empat file binary.
 
 Setelah extract `NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip`:
 
