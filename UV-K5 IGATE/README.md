@@ -11,6 +11,10 @@ Two UV-K5 firmware variants are provided:
 
 Both variants use the **same ESP32 firmware and the same UART protocol**.
 
+## Connection Diagram
+
+![NUSA UV-K5 iGATE Connection Diagram](Connection%20Diagram.webp)
+
 ## Architecture
 
 ```text
