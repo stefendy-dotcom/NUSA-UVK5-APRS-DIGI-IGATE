@@ -1,0 +1,82 @@
+name: Publish NUSA UV-K5 iGATE REV1A
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/publish-igate-rev1a.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download verified build artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://map.aprsid.com/static/nusa-uvk5-igate-rev1a"
+          mkdir -p IGATE/REV1A/firmware IGATE/REV1A/esp32
+          curl -fL "$BASE/NUSA_UVK5_IGATE_REV1A.packed.bin" -o IGATE/REV1A/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
+          curl -fL "$BASE/NUSA_UVK5_ESP32_IGATE_REV1A_FULL.bin" -o IGATE/REV1A/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_FULL.bin
+          curl -fL "$BASE/NUSA_UVK5_ESP32_IGATE_REV1A_APP.bin" -o IGATE/REV1A/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_APP.bin
+          curl -fL "$BASE/NUSA_UVK5_ESP32_IGATE_REV1A.ino" -o IGATE/REV1A/esp32/NUSA_UVK5_ESP32_IGATE_REV1A.ino
+
+      - name: Verify SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "b35d323e99ff9ec9e216c00bccdafe938fd6f17d132065696bb48dc3c20c842e  IGATE/REV1A/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin" | sha256sum -c -
+          echo "1dd3c8b17de5b8ccb88cc698a77af61d7befb2f76f592596670b2ee2ec8eb34c  IGATE/REV1A/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_FULL.bin" | sha256sum -c -
+          echo "377ad9914cf66f6c7cd98ab4b42cb55f82ac9e8786165cb609ffd15abe1554c7  IGATE/REV1A/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_APP.bin" | sha256sum -c -
+          echo "1b5dc028d51ddc237afbe79d71e2a857cb49eae699a5d0435ccb614801d67ddc  IGATE/REV1A/esp32/NUSA_UVK5_ESP32_IGATE_REV1A.ino" | sha256sum -c -
+          (
+            cd IGATE/REV1A
+            sha256sum firmware/NUSA_UVK5_IGATE_REV1A.packed.bin \
+                      esp32/NUSA_UVK5_ESP32_IGATE_REV1A_FULL.bin \
+                      esp32/NUSA_UVK5_ESP32_IGATE_REV1A_APP.bin \
+                      esp32/NUSA_UVK5_ESP32_IGATE_REV1A.ino > SHA256SUMS.txt
+          )
+
+      - name: Commit artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add IGATE/REV1A/firmware IGATE/REV1A/esp32 IGATE/REV1A/SHA256SUMS.txt
+          if ! git diff --cached --quiet; then
+            git commit -m "Publish NUSA UV-K5 iGATE REV1A binaries"
+            git push
+          fi
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="igate-rev1a"
+          TITLE="NUSA UV-K5 iGATE REV1A"
+          git fetch origin main
+          HEAD_SHA="$(git rev-parse origin/main)"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release delete "$TAG" --cleanup-tag -y
+          fi
+          git tag -f "$TAG" "$HEAD_SHA"
+          git push origin "refs/tags/$TAG" --force
+          gh release create "$TAG" \
+            IGATE/REV1A/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin \
+            IGATE/REV1A/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_FULL.bin \
+            IGATE/REV1A/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_APP.bin \
+            IGATE/REV1A/esp32/NUSA_UVK5_ESP32_IGATE_REV1A.ino \
+            IGATE/REV1A/SHA256SUMS.txt \
+            --title "$TITLE" \
+            --notes "NUSA UV-K5 iGATE REV1A. UV-K5 packed firmware plus ESP32 FULL and APP binaries. RF to APRS-IS has been field-tested. IS to RF APRS message gating is implemented and remains pending on-air field validation. See IGATE/REV1A/README.md, README_ID.md and FLASHING.md for wiring, setup and flashing instructions."
