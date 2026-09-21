@@ -1,8 +1,8 @@
 # NUSA UV-K5 iGATE REV1A — Bahasa Indonesia
 
-**NUSA UV-K5 iGATE REV1A** menjadikan Quansheng UV-K5/UV-5K sebagai sisi radio/modem RF untuk APRS iGate. ESP32 DevKit/WROOM-32 menangani koneksi Wi-Fi, APRS-IS, filter message, dan dashboard web.
+**NUSA UV-K5 iGATE REV1A** menjadikan Quansheng UV-K5/UV-5K sebagai sisi radio/modem RF untuk APRS iGate. ESP32 DevKit/WROOM-32 menangani Wi-Fi, APRS-IS, filter message, dan dashboard web.
 
-REV1A ini adalah versi **normal / manual-start**. Setelah radio dinyalakan, UV-K5 masih bekerja sebagai HT biasa. Masuk ke layar APRS/iGate menggunakan action APRS yang dikonfigurasi, biasanya **Long F2**. Versi standalone/autostart dapat dibuat kemudian tanpa mengubah engine RF yang sudah terbukti.
+REV1A adalah versi **normal / manual-start**. Setelah radio dinyalakan, UV-K5 masih dapat bekerja sebagai HT biasa. Masuk ke layar APRS/iGate menggunakan action APRS, biasanya **Long F2**.
 
 ## Arsitektur
 
@@ -22,7 +22,7 @@ ESP32 DevKit / WROOM-32
 APRS-IS
 ```
 
-Jalur balik yang sudah diimplementasikan:
+Jalur balik:
 
 ```text
 APRS-IS message
@@ -41,50 +41,62 @@ Stasiun RF lokal
 ## Fitur utama
 
 - Firmware iGate APRS khusus UV-K5.
-- Modem RF Bell 202 / AX.25 1200 baud dijalankan langsung di firmware UV-K5.
+- Bell 202 / AX.25 1200 baud berjalan langsung di firmware UV-K5.
 - ESP32 menghubungkan UV-K5 ke APRS-IS melalui Wi-Fi.
-- Gating RF -> APRS-IS dengan penanganan stasiun direct/indirect.
-- APRS-IS -> RF dibatasi **hanya untuk APRS message**.
-- Target IS -> RF harus benar-benar terdengar **DIRECT melalui RF dalam 30 menit terakhir**.
+- Gating RF -> APRS-IS untuk packet direct/indirect.
+- APRS-IS -> RF dibatasi **hanya APRS message**.
+- Target IS -> RF harus terdengar **DIRECT melalui RF dalam 30 menit terakhir**.
 - Callsign + SSID target harus cocok tepat.
-- Proteksi loop untuk NOGATE, RFONLY, TCPXX, Internet-heard station, duplicate, dan third-party handling.
-- Dashboard web ESP32 di `http://192.168.4.1/`.
-- AP default ESP32: `NUSA-IGATE` / `12345678`.
-- UART UV-K5 <-> ESP32: **38400 baud, 8N1**.
+- Proteksi loop untuk NOGATE, RFONLY, TCPXX, Internet-heard station, duplicate dan third-party.
+- Dashboard web: `http://192.168.4.1/`.
+- AP default: `NUSA-IGATE` / `12345678`.
+- UART: **38400 baud, 8N1**.
 - TOCALL beacon posisi: `APZUAG`.
-- Symbol posisi: alternate table `\` dan symbol `&` (`\&`).
 - Path posisi: `WIDE2-1`.
 - Comment posisi: `NUSA IGATE`.
-- Saat APRS/iGate aktif receiver dikunci ke satu VFO terpilih. Dual Watch dimatikan agar penerimaan packet tidak terpotong karena radio berpindah VFO.
+- Dual Watch dimatikan saat APRS aktif agar packet tidak terpotong karena perpindahan VFO.
 
-## Status pengujian saat ini
+## Status pengujian
 
 - Firmware UV-K5: compile sudah diverifikasi.
 - UV-K5 `.packed.bin`: CRC packed sudah diverifikasi.
-- Sketch ESP32: compile sudah berhasil menggunakan **Arduino-ESP32 core 3.3.11**, target `esp32:esp32:esp32` (ESP32 Dev Module / kelas WROOM-32).
+- Paket binary ESP32: compile berhasil menggunakan **Arduino-ESP32 core 3.3.11**, target `esp32:esp32:esp32`.
 - Interface UART yang sudah dikoreksi: **sudah berhasil diuji pada hardware nyata**.
-- Jalur RF -> ESP32 -> APRS-IS: **sudah berhasil diuji pada hardware nyata**.
-- Jalur APRS-IS -> RF message: sudah diimplementasikan, tetapi jangan disebut field-tested sampai benar-benar diuji on-air pada instalasi ini.
+- RF -> ESP32 -> APRS-IS: **sudah berhasil diuji pada hardware nyata**.
+- APRS-IS -> RF message: sudah diimplementasikan, masih menunggu pengujian on-air.
 
-## File
+## File rilis
 
 ```text
 firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
-esp32/NUSA_UVK5_ESP32_IGATE_REV1A_FULL.bin
-esp32/NUSA_UVK5_ESP32_IGATE_REV1A_APP.bin
-esp32/NUSA_UVK5_ESP32_IGATE_REV1A.ino
-docs/NUSA_UVK5_IGATE_REV1A_CONNECTION.png
+esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip
 FLASHING.md
 SHA256SUMS.txt
 ```
 
-Untuk pengguna ESP32 biasa, gunakan **`NUSA_UVK5_ESP32_IGATE_REV1A_FULL.bin`**. File ini merupakan merged image 4 MB dan di-flash mulai address `0x0`.
+Source ESP32 `.ino` **tidak didistribusikan** pada rilis ini. ESP32 diberikan sebagai paket ZIP hasil compile yang berisi tepat empat file binary.
 
-`APP.bin` disediakan untuk pengguna lanjutan/recovery dan hanya di-flash pada `0x10000` apabila bootloader dan partition table yang kompatibel sudah terpasang.
+Setelah extract `NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip`:
 
-## Koneksi UART yang benar
+```text
+NUSA_UVK5_ESP32_IGATE_REV1A_bootloader.bin
+NUSA_UVK5_ESP32_IGATE_REV1A_partitions.bin
+NUSA_UVK5_ESP32_IGATE_REV1A_boot_app0.bin
+NUSA_UVK5_ESP32_IGATE_REV1A_firmware.bin
+```
 
-Gunakan gambar koneksi di repository ini. Jalur utamanya:
+Address flash:
+
+```text
+0x1000  bootloader
+0x8000  partitions
+0xE000  boot_app0
+0x10000 firmware
+```
+
+Baca **[FLASHING.md](FLASHING.md)** untuk prosedur lengkap.
+
+## Koneksi UART
 
 ```text
 UV-K5 2.5 mm RING   (UART TX) -- 1 kΩ --> ESP32 GPIO16 / RX2
@@ -92,7 +104,7 @@ UV-K5 2.5 mm SLEEVE (GND) -------------- ESP32 GND
 ESP32 GPIO17 / TX2 -- 1 kΩ --> UV-K5 3.5 mm SLEEVE (MIC-/PTT/UART RX)
 ```
 
-Jangan sambungkan bagian berikut ke ESP32:
+Jangan sambungkan ke ESP32:
 
 ```text
 UV-K5 2.5 mm TIP  = SPK+
@@ -100,22 +112,18 @@ UV-K5 3.5 mm RING = MIC+
 UV-K5 3.5 mm TIP  = radio V+
 ```
 
-**TIP 3.5 mm membawa tegangan dari radio. Jangan dihubungkan ke GPIO maupun GND ESP32.**
-
-![Diagram koneksi NUSA UV-K5 iGATE](docs/NUSA_UVK5_IGATE_REV1A_CONNECTION.png)
+**TIP 3.5 mm membawa tegangan radio. Jangan dihubungkan ke GPIO atau GND ESP32.**
 
 ## Cara penggunaan dasar
 
-1. Set frekuensi APRS pada VFO UV-K5 yang akan digunakan iGate.
-2. Masuk ke layar APRS/iGate UV-K5, biasanya dengan Long F2.
+1. Set frekuensi APRS pada VFO UV-K5 yang digunakan iGate.
+2. Masuk layar APRS/iGate, biasanya Long F2.
 3. Nyalakan ESP32 dan hubungkan ke AP `NUSA-IGATE`.
-4. Buka `http://192.168.4.1/`, lalu isi Wi-Fi, callsign/SSID iGate, dan server APRS-IS.
+4. Buka `http://192.168.4.1/`, isi Wi-Fi, callsign/SSID iGate dan APRS-IS.
 5. Pastikan Wi-Fi connected dan APRS-IS menunjukkan `VERIFIED`.
-6. Kirim packet APRS dari radio/stasiun lain.
-7. Pastikan UV-K5 decode packet dan counter **RF -> APRS-IS** di dashboard ESP32 meningkat.
-8. Pastikan packet masuk APRS-IS / map APRS.
-
-Baca **[FLASHING.md](FLASHING.md)** sebelum memasang binary UV-K5 maupun ESP32.
+6. Kirim packet APRS dari stasiun RF lain.
+7. Pastikan UV-K5 decode dan counter **RF -> APRS-IS** meningkat.
+8. Pastikan packet masuk APRS-IS.
 
 ## Credit
 
@@ -125,8 +133,6 @@ YF9UAG
 Indonesia
 ```
 
-Dikembangkan dari ekosistem firmware open-source Quansheng UV-K5 serta referensi komunitas APRS.
+## Keselamatan dan regulasi
 
-## Catatan keselamatan dan regulasi
-
-Sebelum menyalakan perangkat, verifikasi TIP/RING/SLEEVE dengan multimeter. Jangan mengandalkan warna kabel sebagai identifikasi pin. Frekuensi, power, identifikasi callsign, serta aturan operasi unattended berbeda di setiap negara; operator bertanggung jawab mengikuti regulasi radio amatir yang berlaku.
+Verifikasi wiring menggunakan multimeter sebelum memberikan daya. Jangan mengandalkan warna kabel untuk menentukan TIP/RING/SLEEVE. Operator bertanggung jawab terhadap frekuensi, power, callsign dan operasi unattended sesuai regulasi yang berlaku.
