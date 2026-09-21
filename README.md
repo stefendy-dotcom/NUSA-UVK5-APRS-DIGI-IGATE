@@ -1,5 +1,8 @@
 # NUSA UV-K5 APRS
 
+[![REV1G Downloads](https://img.shields.io/github/downloads/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/rev1g/total?style=for-the-badge&logo=github&label=REV1G%20Downloads)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g)
+[![iGate REV1A Downloads](https://img.shields.io/github/downloads/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/igate-rev1a/total?style=for-the-badge&logo=github&label=iGate%20REV1A%20Downloads)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
+
 Repository for the NUSA UV-K5 APRS projects by **YF9UAG**.
 
 ## Projects
