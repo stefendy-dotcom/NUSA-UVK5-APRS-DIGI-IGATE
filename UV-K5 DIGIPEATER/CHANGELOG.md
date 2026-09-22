@@ -1,5 +1,28 @@
 # Changelog
 
+## REV1H Standalone
+
+Standalone-only feature revision based on the proven REV1G Bell 202 / AX.25 RF engine.
+
+Added:
+
+- dedicated APRS-only menu
+- editable standalone `APRFq`
+- selectable Station / APRS Object beacon
+- editable APRS Object Name, maximum 9 characters
+- editable user comment suffix, maximum 16 characters
+- mandatory transmitted comment prefix `NUSA DIGI`
+- editable APRS symbol table (`/` or `\\`)
+- editable APRS symbol code
+- APRS Object alive marker `*` with pseudo timestamp `111111z`
+- non-APRS HT features removed from the dedicated build to preserve flash space
+
+Validation:
+
+- compile verified with `-Werror`
+- packed CRC-XMODEM verified
+- hardware/on-air field test of REV1H pending
+
 ## REV1G
 
 - Bell 202 AFSK TX using 1200 Hz / 2200 Hz tones.
