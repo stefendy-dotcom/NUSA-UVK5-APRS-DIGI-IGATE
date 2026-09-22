@@ -1,0 +1,45 @@
+name: Update cumulative download counters
+
+on:
+  release:
+    types: [published, released, edited, deleted, unpublished]
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cumulative-download-counter
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Calculate cumulative Release Asset downloads
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 .github/scripts/update_download_counts.py
+
+      - name: Commit changed counters
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if git diff --quiet -- badges/; then
+            echo "Download counters are unchanged."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add badges/
+          git commit -m "chore: update cumulative download counters"
+          git push
