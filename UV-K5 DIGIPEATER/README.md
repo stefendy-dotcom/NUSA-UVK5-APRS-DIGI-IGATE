@@ -61,10 +61,10 @@ SHA256:
 
 Custom APRS digipeater firmware for the **Quansheng UV-K5**, developed and field-tested for Bell 202 / AX.25 APRS operation.
 
-This first public release contains two firmware variants:
+Current firmware choices are:
 
 1. **REV1G — Normal APRS Digipeater**
-2. **REV1G Standalone — Dedicated Autostart APRS Digipeater**
+2. **REV1H Standalone — Dedicated Autostart APRS Digipeater**
 
 > **Important:** Flash only the `.packed.bin` file intended for the UV-K5 firmware updater. Keep a known-good firmware available for recovery before experimenting with custom firmware.
 
@@ -72,7 +72,7 @@ This first public release contains two firmware variants:
 
 ## Firmware Variants
 
-| Feature | REV1G Normal | REV1G Standalone |
+| Feature | REV1G Normal | REV1H Standalone |
 |---|---:|---:|
 | APRS digipeater | Yes | Yes |
 | Bell 202 / AX.25 | Yes | Yes |
@@ -80,6 +80,11 @@ This first public release contains two firmware variants:
 | SoundModem-tested TX | Yes | Same proven REV1G engine |
 | Manual position beacon | Yes | Yes |
 | Automatic position beacon | Yes | Yes |
+| Station / APRS Object beacon | Station | Selectable |
+| Editable Object Name | No | Yes, 9 chars |
+| Editable comment suffix | No | Yes, 16 chars |
+| Mandatory comment prefix | `NUSA DIGI` | `NUSA DIGI` |
+| Editable APRS symbol | No | Yes, table + code |
 | Enter APRS manually | Yes | No |
 | APRS autostart after reboot | No | Yes |
 | Dedicated single-frequency operation | No | Yes |
@@ -92,13 +97,13 @@ Recommended firmware filenames:
 ```text
 firmware/
 ├── NUSA_UVK5_APRS_DIGI_REV1G.packed.bin
-└── NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
+└── NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
 
 Current APZUAG beacon builds:
 
 ```text
 REV1G SHA256       : b0d4331021a74450aca2aac70925a1e8b8aa04d4247bcc697d7f8225711128c8
-Standalone SHA256  : 70202070d8373dc4a383800cc1bfd6cf4e6aae79cc73e52efc7828484fd48813
+Standalone SHA256  : 228ceffff79247095cbc495976c13f07f8d90f10828409360dbce96b3e21fea2
 Beacon TOCALL      : APZUAG
 ```
 ```
@@ -191,12 +196,12 @@ DgSSID = 3
 
 ---
 
-# REV1G Standalone
+# REV1H Standalone
 
 Firmware:
 
 ```text
-NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
+NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
 ```
 
 This build is intended to turn the UV-K5 into a **dedicated APRS digipeater appliance**.
@@ -360,8 +365,8 @@ The firmware converts the coordinates to APRS `DDMM.mm` / `DDDMM.mm` format.
 ```text
 Destination : APZUAG
 Path        : WIDE2-1
-Symbol      : #
-Comment     : NUSA DIGI
+Symbol      : editable in REV1H Standalone
+Comment     : NUSA DIGI + optional editable suffix
 ```
 
 Example:
@@ -474,7 +479,7 @@ Choose the firmware you want to install:
 
 ```text
 NUSA_UVK5_APRS_DIGI_REV1G.packed.bin
-NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
+NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
 ```
 
 Follow the instructions provided by the UV-K5 firmware updater you choose.
@@ -493,7 +498,7 @@ Do **not** flash a `.raw.bin` file unless you specifically know why it is needed
 
 Do not disconnect the programming cable, turn the radio off, or remove power while firmware is being written.
 
-### Recommended first setup for REV1G Standalone
+### Recommended first setup for REV1H Standalone
 
 ```text
 APRFq  = local APRS frequency
@@ -553,7 +558,7 @@ Pilih firmware yang ingin dipasang:
 
 ```text
 NUSA_UVK5_APRS_DIGI_REV1G.packed.bin
-NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
+NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
 ```
 
 Ikuti prosedur yang diberikan oleh software firmware updater UV-K5 yang digunakan.
@@ -570,7 +575,7 @@ Jangan flash file `.raw.bin` kecuali benar-benar memahami kegunaannya.
 
 Jangan mencabut kabel programming, mematikan radio, atau memutus daya selama proses penulisan firmware sedang berlangsung.
 
-### Konfigurasi awal yang disarankan untuk REV1G Standalone
+### Konfigurasi awal yang disarankan untuk REV1H Standalone
 
 ```text
 APRFq  = frekuensi APRS setempat
@@ -680,7 +685,7 @@ Stable RF baseline:
 - manual and automatic fixed-position beacon
 - configurable TX preamble and tail
 
-## REV1G Standalone
+## REV1H Standalone
 
 Dedicated unattended digipeater variant:
 
@@ -699,4 +704,4 @@ Dedicated unattended digipeater variant:
 
 Use **REV1G Normal** when you still want manual APRS entry and more normal HT flexibility.
 
-Use **REV1G Standalone** when the UV-K5 will be installed as a dedicated single-frequency APRS digipeater.
+Use **REV1H Standalone** when the UV-K5 will be installed as a dedicated single-frequency APRS digipeater.
