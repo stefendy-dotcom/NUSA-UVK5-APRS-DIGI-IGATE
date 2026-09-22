@@ -1,5 +1,64 @@
 # NUSA UV-K5 APRS Digipeater — Bahasa Indonesia
 
+## Terbaru khusus Standalone: REV1H
+
+**REV1G Normal tetap menjadi baseline RF yang sudah field-tested. REV1H hanya merevisi versi Standalone.**
+
+Firmware:
+
+```text
+firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
+```
+
+Release: [rev1h-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone)
+
+Menu APRS Standalone REV1H:
+
+```text
+TxPwr
+APRFq
+DgCall
+DgSSID
+DgDly
+DgTail
+PosBcn
+BType
+ObjNam
+BComnt
+SymTbl
+Symbol
+BLat
+LatNS
+BLon
+LonEW
+```
+
+Fitur baru:
+
+- `BType`: pilih beacon Station atau APRS Object.
+- `ObjNam`: Object Name dapat diedit, maksimum 9 karakter; default `NUSA-DIGI`.
+- `BComnt`: suffix comment dapat diedit, maksimum 16 karakter.
+- `SymTbl`: pilih symbol table utama `/` atau alternate `\`.
+- `Symbol`: kode symbol APRS dapat diedit.
+- Beacon Object memakai alive marker `*` dan pseudo timestamp `111111z`.
+- Comment yang dipancarkan **selalu diawali `NUSA DIGI`**. User hanya mengedit teks setelah prefix tersebut.
+
+Contoh jika `BComnt = WAMENA`:
+
+```text
+NUSA DIGI WAMENA
+```
+
+Status REV1H Standalone: **build verified + packed CRC verified**, tetapi **belum field-tested pada hardware/on-air**.
+
+SHA256:
+
+```text
+228ceffff79247095cbc495976c13f07f8d90f10828409360dbce96b3e21fea2
+```
+
+---
+
 Firmware APRS digipeater untuk **Quansheng UV-K5**.
 
 Rilis awal GitHub berisi dua firmware:
