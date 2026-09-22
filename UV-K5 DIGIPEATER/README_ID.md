@@ -64,7 +64,7 @@ Firmware APRS digipeater untuk **Quansheng UV-K5**.
 Rilis awal GitHub berisi dua firmware:
 
 1. **REV1G Normal**
-2. **REV1G Standalone Digipeater**
+2. **REV1H Standalone Digipeater**
 
 ## REV1G Normal
 
@@ -101,14 +101,14 @@ DgTail = 60 ms
 
 Untuk masuk APRS gunakan Long F2 jika action F2 Long sudah diatur ke APRS.
 
-## REV1G Standalone
+## REV1H Standalone
 
 Gunakan versi ini jika UV-K5 akan dijadikan **APRS digipeater permanen**.
 
 Firmware:
 
 ```text
-NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin
+NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
 ```
 
 Setelah radio dinyalakan:
