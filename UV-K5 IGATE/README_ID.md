@@ -1,11 +1,11 @@
-# NUSA UV-K5 iGATE REV1A — Bahasa Indonesia
+# NUSA UV-K5 iGATE — Bahasa Indonesia
 
-**NUSA UV-K5 iGATE REV1A** menjadikan Quansheng UV-K5/UV-5K sebagai sisi radio/modem RF untuk APRS iGate. ESP32 DevKit/WROOM-32 atau ESP32-C3 menangani Wi-Fi, APRS-IS, filtering, dan dashboard web.
+**NUSA UV-K5 iGATE** menjadikan Quansheng UV-K5/UV-5K sebagai sisi radio/modem RF untuk APRS iGate. REV1A adalah baseline Normal dan REV1B adalah revisi khusus Standalone. ESP32 DevKit/WROOM-32 atau ESP32-C3 menangani Wi-Fi, APRS-IS, filtering, dan dashboard web.
 
 Tersedia dua varian firmware UV-K5:
 
 1. **REV1A Normal** — APRS/iGate masuk secara manual, biasanya Long F2.
-2. **REV1A Standalone** — mode iGate dedicated aktif otomatis setelah radio dinyalakan.
+2. **REV1B Standalone** — mode iGate dedicated aktif otomatis setelah radio dinyalakan.
 
 Kedua varian UV-K5 menggunakan **protokol UART yang sama**. Paket binary terpisah tersedia untuk ESP32 klasik/WROOM-32 dan ESP32-C3.
 
@@ -103,7 +103,7 @@ Stasiun RF lokal
 
 ## Varian firmware
 
-| Fungsi | REV1A Normal | REV1A Standalone |
+| Fungsi | REV1A Normal | REV1B Standalone |
 |---|---|---|
 | Start APRS/iGate | Manual, biasanya Long F2 | Otomatis saat power-on |
 | VFO yang digunakan | VFO yang dipilih saat masuk APRS | VFO A |
@@ -116,6 +116,12 @@ Stasiun RF lokal
 | Firmware ESP32 | Sama | Sama |
 | RF -> APRS-IS | Sama | Sama |
 | APRS-IS -> RF message | Sama | Sama |
+| Menu frekuensi APRS khusus | Tidak | Ya |
+| Beacon Station / APRS Object | Station | Bisa dipilih |
+| Object Name editable | Tidak | Ya, 9 karakter |
+| Suffix comment editable | Tidak | Ya, 16 karakter |
+| Prefix comment wajib | `NUSA IGATE` | `NUSA IGATE` |
+| Symbol APRS editable | Tidak | Ya, table + code |
 
 ### REV1A Normal
 
@@ -127,12 +133,12 @@ firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
 
 Pilih VFO/frekuensi APRS, kemudian masuk APRS/iGate secara manual.
 
-### REV1A Standalone
+### REV1B Standalone
 
 Firmware:
 
 ```text
-firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
+firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
 ```
 
 Alur standalone:
@@ -149,7 +155,7 @@ Dual Watch OFF
 Cross Band OFF
    |
    v
-Gunakan frekuensi RX VFO A yang tersimpan
+Gunakan APRFq khusus yang tersimpan (boot pertama mewarisi VFO-A)
 Paksa APRS simplex saat runtime
    |
    v
@@ -176,15 +182,17 @@ Standalone mempertahankan engine Bell-202, AX.25, UART framing, RF -> APRS-IS, s
 - UART: **38400 baud, 8N1**.
 - TOCALL beacon posisi: `APZUAG`.
 - Path: `WIDE2-1`.
-- Comment: `NUSA IGATE`.
+- Comment selalu diawali `NUSA IGATE`.
+- REV1B Standalone dapat memilih beacon Station atau APRS Object.
+- REV1B Standalone menyediakan Object Name 9 karakter, suffix comment 16 karakter, symbol table dan symbol code yang dapat diedit.
 
 ## Status pengujian
 
 - REV1A Normal UV-K5: compile dan packed CRC sudah diverifikasi.
 - Interface UART yang sudah dikoreksi: **sudah berhasil diuji pada hardware nyata**.
 - REV1A Normal RF -> ESP32 -> APRS-IS: **sudah berhasil diuji pada hardware nyata**.
-- REV1A Standalone UV-K5: **compile dan packed CRC sudah diverifikasi**.
-- REV1A Standalone: **belum diuji pada hardware nyata**.
+- REV1B Standalone UV-K5: **compile dan packed CRC sudah diverifikasi**.
+- REV1B Standalone: **belum diuji pada hardware nyata**.
 - APRS-IS -> RF message: sudah diimplementasikan, masih menunggu pengujian on-air.
 - Paket ESP32-C3: **compile verified** menggunakan Arduino-ESP32 core 3.3.11 (`esp32:esp32:esp32c3`); pengujian hardware masih pending.
 
@@ -192,7 +200,7 @@ Standalone mempertahankan engine Bell-202, AX.25, UART framing, RF -> APRS-IS, s
 
 ```text
 firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
-firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
+firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
 esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip
 esp32/NUSA_UVK5_ESP32C3_IGATE_REV1A_BIN.zip
 FLASHING.md
