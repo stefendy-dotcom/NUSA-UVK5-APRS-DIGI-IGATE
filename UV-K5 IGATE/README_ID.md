@@ -11,7 +11,7 @@ Kedua varian menggunakan **firmware ESP32 dan protokol UART yang sama**.
 
 ## Diagram Koneksi
 
-![Diagram Koneksi NUSA UV-K5 iGATE](Connection%20Diagram.webp)
+![Diagram Koneksi NUSA UV-K5 iGATE](Connection%20Diagram.png)
 
 ## Arsitektur
 
