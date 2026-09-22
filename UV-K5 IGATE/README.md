@@ -11,6 +11,58 @@ Two UV-K5 firmware variants are provided:
 
 Both UV-K5 variants use the **same UART protocol**. Separate compiled ESP32 packages are provided for classic ESP32/WROOM-32 and ESP32-C3.
 
+## Latest Standalone: REV1B
+
+> **REV1A Normal remains the field-tested iGate baseline. REV1B is a Standalone-only feature revision.**
+
+Firmware:
+
+```text
+firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
+```
+
+Release: **[igate-rev1b-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone)**
+
+REV1B Standalone retains the existing UV-K5 ↔ ESP32 UART/iGate engine and adds dedicated APRS beacon controls:
+
+```text
+TxPwr
+APRFq
+IS2RF
+IgCall
+IgSSID
+TxDly
+TxTail
+PosBcn
+BType
+ObjNam
+BComnt
+SymTbl
+Symbol
+BLat
+LatNS
+BLon
+LonEW
+```
+
+- `BType`: Station or APRS Object beacon.
+- `ObjNam`: editable Object Name, maximum 9 characters. Default: `NUSAIGATE`.
+- `BComnt`: editable user comment suffix, maximum 16 characters.
+- `SymTbl`: APRS primary `/` or alternate `\` symbol table.
+- `Symbol`: editable printable APRS symbol code.
+- Object beacon uses alive marker `*` and pseudo timestamp `111111z`.
+- Every beacon comment always begins with **`NUSA IGATE`**; the menu edits only the suffix.
+
+The same ESP32 REV1A package/protocol is retained; no new ESP32 firmware is required for this UV-K5 Standalone revision.
+
+**Validation status:** build verified and packed-CRC verified; hardware/on-air testing of REV1B Standalone is pending.
+
+SHA256:
+
+```text
+d3b69b7c1cddd886248a6afceaca68987a30007ecca2aadba0ea0da7dfcb8c21
+```
+
 ## Connection Diagram
 
 ![NUSA UV-K5 iGATE Connection Diagram](Connection%20Diagram.png)
