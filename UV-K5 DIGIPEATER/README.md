@@ -1,5 +1,62 @@
 # NUSA UV-K5 APRS Digipeater
 
+# Latest Standalone: REV1H
+
+> **REV1G Normal remains the field-tested RF baseline. REV1H is a Standalone-only feature revision.**
+
+Firmware:
+
+```text
+firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
+```
+
+Release: **[rev1h-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone)**
+
+REV1H Standalone adds these dedicated APRS controls while retaining the REV1G Bell-202 / AX.25 digipeater engine:
+
+```text
+TxPwr
+APRFq
+DgCall
+DgSSID
+DgDly
+DgTail
+PosBcn
+BType
+ObjNam
+BComnt
+SymTbl
+Symbol
+BLat
+LatNS
+BLon
+LonEW
+```
+
+- `BType`: select normal Station beacon or APRS Object beacon.
+- `ObjNam`: editable APRS Object Name, maximum 9 characters. Default: `NUSA-DIGI`.
+- `BComnt`: editable user comment suffix, maximum 16 characters.
+- `SymTbl`: select APRS primary `/` or alternate `\` symbol table.
+- `Symbol`: select the printable APRS symbol code.
+- Object beacon uses the APRS alive marker `*` and pseudo timestamp `111111z`.
+- The transmitted comment always starts with **`NUSA DIGI`**. The menu edits only the suffix, so this identifier cannot be removed.
+
+Example with user suffix `WAMENA`:
+
+```text
+...#NUSA DIGI WAMENA
+```
+
+**Validation status:** REV1H Standalone is **build verified and packed-CRC verified**. Hardware/on-air field testing of this new revision is still pending.
+
+SHA256:
+
+```text
+228ceffff79247095cbc495976c13f07f8d90f10828409360dbce96b3e21fea2
+```
+
+---
+
 [![REV1G Downloads](https://img.shields.io/github/downloads/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/rev1g/total?style=for-the-badge&logo=github&label=REV1G%20Downloads)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g)
 
 Custom APRS digipeater firmware for the **Quansheng UV-K5**, developed and field-tested for Bell 202 / AX.25 APRS operation.
