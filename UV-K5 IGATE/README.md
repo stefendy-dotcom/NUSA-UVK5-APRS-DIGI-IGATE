@@ -1,13 +1,13 @@
-# NUSA UV-K5 iGATE REV1A
+# NUSA UV-K5 iGATE
 
 [![iGate REV1A Downloads](https://img.shields.io/github/downloads/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/igate-rev1a/total?style=for-the-badge&logo=github&label=iGate%20REV1A%20Downloads)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
 
-**NUSA UV-K5 iGATE REV1A** turns a Quansheng UV-K5/UV-5K into the RF modem/radio side of a Wi-Fi APRS iGate. An ESP32 DevKit/WROOM-32 or ESP32-C3 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
+**NUSA UV-K5 iGATE** turns a Quansheng UV-K5/UV-5K into the RF modem/radio side of a Wi-Fi APRS iGate. REV1A is the Normal baseline and REV1B is the dedicated Standalone revision. An ESP32 DevKit/WROOM-32 or ESP32-C3 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
 
 Two UV-K5 firmware variants are provided:
 
 1. **REV1A Normal** — APRS/iGate is entered manually, normally with Long F2.
-2. **REV1A Standalone** — dedicated iGate mode starts automatically after power-on.
+2. **REV1B Standalone** — dedicated iGate mode starts automatically after power-on.
 
 Both UV-K5 variants use the **same UART protocol**. Separate compiled ESP32 packages are provided for classic ESP32/WROOM-32 and ESP32-C3.
 
@@ -103,7 +103,7 @@ Local RF station
 
 ## Firmware variants
 
-| Feature | REV1A Normal | REV1A Standalone |
+| Feature | REV1A Normal | REV1B Standalone |
 |---|---|---|
 | APRS/iGate startup | Manual, normally Long F2 | Automatic at power-on |
 | VFO used | Selected VFO when APRS is entered | VFO A |
@@ -116,6 +116,12 @@ Local RF station
 | ESP32 firmware | Same | Same |
 | RF -> APRS-IS | Same | Same |
 | APRS-IS -> RF message gating | Same | Same |
+| Dedicated APRS frequency menu | No | Yes |
+| Station / APRS Object beacon | Station | Selectable |
+| Editable Object Name | No | Yes, 9 chars |
+| Editable comment suffix | No | Yes, 16 chars |
+| Mandatory comment prefix | `NUSA IGATE` | `NUSA IGATE` |
+| Editable APRS symbol | No | Yes, table + code |
 
 ### REV1A Normal
 
@@ -127,12 +133,12 @@ firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
 
 Select the APRS frequency/VFO, then enter APRS/iGate mode manually.
 
-### REV1A Standalone
+### REV1B Standalone
 
 Firmware:
 
 ```text
-firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
+firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
 ```
 
 Standalone behavior:
@@ -149,7 +155,7 @@ Dual Watch OFF
 Cross Band OFF
    |
    v
-Use stored VFO-A RX frequency
+Use dedicated stored APRFq (first boot inherits VFO-A)
 Force simplex APRS runtime
    |
    v
@@ -176,15 +182,17 @@ The ESP32 does **not** need a different firmware.
 - UART: **38400 baud, 8N1**.
 - Position beacon TOCALL: `APZUAG`.
 - Position path: `WIDE2-1`.
-- Position comment: `NUSA IGATE`.
+- Position comment always begins with `NUSA IGATE`.
+- REV1B Standalone can select Station or APRS Object beacon.
+- REV1B Standalone provides editable 9-character Object Name, 16-character comment suffix, symbol table and symbol code.
 
 ## Validation status
 
 - REV1A Normal UV-K5 firmware: compile verified, packed CRC verified.
 - Corrected UART interface: **field-tested successfully**.
 - REV1A Normal RF -> ESP32 -> APRS-IS: **field-tested successfully**.
-- REV1A Standalone UV-K5 firmware: **compile verified and packed CRC verified**.
-- REV1A Standalone: **not yet field-tested on hardware**.
+- REV1B Standalone UV-K5 firmware: **compile verified and packed CRC verified**.
+- REV1B Standalone: **not yet field-tested on hardware**.
 - IS -> RF APRS message path: implemented; pending on-air field validation.
 - ESP32-C3 package: **compile verified** with Arduino-ESP32 core 3.3.11 (`esp32:esp32:esp32c3`); hardware field test pending.
 
@@ -192,7 +200,7 @@ The ESP32 does **not** need a different firmware.
 
 ```text
 firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
-firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
+firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
 esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip
 esp32/NUSA_UVK5_ESP32C3_IGATE_REV1A_BIN.zip
 FLASHING.md
