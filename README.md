@@ -37,7 +37,9 @@ Main features:
 
 **Release:**
 
-### [Download REV1G →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g)
+### [Download Normal REV1G →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g)
+
+### [Download Standalone REV1H →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone)
 
 ---
 
@@ -213,7 +215,9 @@ This path is implemented and is pending full on-air field validation.
 
 **Release:**
 
-### [Download iGate REV1A →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
+### [Download iGate Normal REV1A →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
+
+### [Download iGate Standalone REV1B →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone)
 
 ---
 
