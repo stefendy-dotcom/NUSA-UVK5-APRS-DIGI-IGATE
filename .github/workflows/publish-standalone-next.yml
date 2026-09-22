@@ -1,0 +1,61 @@
+name: Publish next Standalone firmware
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/publish-standalone-next.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download verified Standalone firmware
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "UV-K5 DIGIPEATER/firmware" "UV-K5 IGATE/firmware"
+          curl -fL "https://map.aprsid.com/static/nusa-uvk5-standalone-next/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin"             -o "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin"
+          curl -fL "https://map.aprsid.com/static/nusa-uvk5-standalone-next/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin"             -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin"
+
+          echo "228ceffff79247095cbc495976c13f07f8d90f10828409360dbce96b3e21fea2  UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin" | sha256sum -c -
+          echo "d3b69b7c1cddd886248a6afceaca68987a30007ecca2aadba0ea0da7dfcb8c21  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin" | sha256sum -c -
+
+      - name: Commit firmware files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin"
+          git add "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin"
+          if ! git diff --cached --quiet; then
+            git commit -m "Add next standalone APRS firmware"
+            git push
+          fi
+
+      - name: Create DIGI REV1H Standalone release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release delete rev1h-standalone --yes --cleanup-tag 2>/dev/null || true
+          gh release create rev1h-standalone             "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin"             --title "NUSA UV-K5 APRS DIGI REV1H Standalone"             --notes "Standalone-only revision. Adds editable APRS beacon type (Station/Object), 9-character Object Name, editable symbol table/code, and editable comment suffix. Every transmitted beacon comment is forced to begin with NUSA DIGI. Build/CRC verified; hardware field test pending."
+
+      - name: Create iGATE REV1B Standalone release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release delete igate-rev1b-standalone --yes --cleanup-tag 2>/dev/null || true
+          gh release create igate-rev1b-standalone             "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin"             --title "NUSA UV-K5 iGATE REV1B Standalone"             --notes "Standalone-only revision. Adds editable APRS beacon type (Station/Object), 9-character Object Name, editable symbol table/code, and editable comment suffix. Every transmitted beacon comment is forced to begin with NUSA IGATE. Existing UV-K5 to ESP32 UART/iGate engine is retained. Build/CRC verified; hardware field test pending."
