@@ -1,13 +1,13 @@
 # NUSA UV-K5 iGATE REV1A — Bahasa Indonesia
 
-**NUSA UV-K5 iGATE REV1A** menjadikan Quansheng UV-K5/UV-5K sebagai sisi radio/modem RF untuk APRS iGate. ESP32 DevKit/WROOM-32 menangani Wi-Fi, APRS-IS, filtering, dan dashboard web.
+**NUSA UV-K5 iGATE REV1A** menjadikan Quansheng UV-K5/UV-5K sebagai sisi radio/modem RF untuk APRS iGate. ESP32 DevKit/WROOM-32 atau ESP32-C3 menangani Wi-Fi, APRS-IS, filtering, dan dashboard web.
 
 Tersedia dua varian firmware UV-K5:
 
 1. **REV1A Normal** — APRS/iGate masuk secara manual, biasanya Long F2.
 2. **REV1A Standalone** — mode iGate dedicated aktif otomatis setelah radio dinyalakan.
 
-Kedua varian menggunakan **firmware ESP32 dan protokol UART yang sama**.
+Kedua varian UV-K5 menggunakan **protokol UART yang sama**. Paket binary terpisah tersedia untuk ESP32 klasik/WROOM-32 dan ESP32-C3.
 
 ## Diagram Koneksi
 
@@ -132,6 +132,7 @@ Standalone mempertahankan engine Bell-202, AX.25, UART framing, RF -> APRS-IS, s
 - REV1A Standalone UV-K5: **compile dan packed CRC sudah diverifikasi**.
 - REV1A Standalone: **belum diuji pada hardware nyata**.
 - APRS-IS -> RF message: sudah diimplementasikan, masih menunggu pengujian on-air.
+- Paket ESP32-C3: **compile verified** menggunakan Arduino-ESP32 core 3.3.11 (`esp32:esp32:esp32c3`); pengujian hardware masih pending.
 
 ## File rilis
 
@@ -139,11 +140,12 @@ Standalone mempertahankan engine Bell-202, AX.25, UART framing, RF -> APRS-IS, s
 firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
 firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
 esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip
+esp32/NUSA_UVK5_ESP32C3_IGATE_REV1A_BIN.zip
 FLASHING.md
 SHA256SUMS.txt
 ```
 
-ZIP ESP32 berisi tepat empat file binary:
+ZIP ESP32 klasik berisi tepat empat file binary:
 
 ```text
 NUSA_UVK5_ESP32_IGATE_REV1A_bootloader.bin
@@ -152,7 +154,16 @@ NUSA_UVK5_ESP32_IGATE_REV1A_boot_app0.bin
 NUSA_UVK5_ESP32_IGATE_REV1A_firmware.bin
 ```
 
-Baca **[FLASHING.md](FLASHING.md)** untuk address ESP32 dan prosedur flash UV-K5.
+ZIP ESP32-C3 juga berisi tepat empat file binary:
+
+```text
+NUSA_UVK5_ESP32C3_IGATE_REV1A_bootloader.bin
+NUSA_UVK5_ESP32C3_IGATE_REV1A_partitions.bin
+NUSA_UVK5_ESP32C3_IGATE_REV1A_boot_app0.bin
+NUSA_UVK5_ESP32C3_IGATE_REV1A_firmware.bin
+```
+
+Baca **[FLASHING.md](FLASHING.md)** untuk address. Pada ESP32-C3 bootloader menggunakan offset **0x0**.
 
 ## Koneksi UART
 
@@ -160,6 +171,14 @@ Baca **[FLASHING.md](FLASHING.md)** untuk address ESP32 dan prosedur flash UV-K5
 UV-K5 2.5 mm RING   (UART TX) -- 1 kΩ --> ESP32 GPIO16 / RX2
 UV-K5 2.5 mm SLEEVE (GND) -------------- ESP32 GND
 ESP32 GPIO17 / TX2 -- 1 kΩ --> UV-K5 3.5 mm SLEEVE (MIC-/PTT/UART RX)
+```
+
+ESP32-C3:
+
+```text
+UV-K5 2.5 mm RING   (UART TX) -- 1 kΩ --> ESP32-C3 GPIO4 / RX
+UV-K5 2.5 mm SLEEVE (GND) -------------- ESP32-C3 GND
+ESP32-C3 GPIO5 / TX -- 1 kΩ --> UV-K5 3.5 mm SLEEVE (MIC-/PTT/UART RX)
 ```
 
 Jangan sambungkan ke ESP32:
