@@ -202,7 +202,7 @@ This path is implemented and is pending full on-air field validation.
 - REV1A Normal UV-K5 firmware: compile verified and packed CRC verified
 - Corrected UV-K5 ↔ ESP32 UART interface: **field-tested successfully**
 - REV1A Normal RF → ESP32 → APRS-IS: **field-tested successfully**
-- REV1A Standalone: compile verified; hardware field test pending
+- REV1B Standalone: compile verified; hardware field test pending
 - IS → RF APRS message path: implemented; on-air field validation pending
 - ESP32-C3 package: compile verified; hardware field test pending
 
