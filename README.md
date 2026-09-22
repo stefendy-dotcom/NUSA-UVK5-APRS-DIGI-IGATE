@@ -13,8 +13,8 @@ APRS projects for the **Quansheng UV-K5 / UV-5K**, developed by **YF9UAG, Indone
 
 | Project | Hardware | Purpose | Current version | Documentation |
 |---|---|---|---|---|
-| **UV-K5 DIGIPEATER** | UV-K5 only | Standalone APRS RF digipeater | REV1G | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
-| **UV-K5 iGATE** | UV-K5 + ESP32 | RF ↔ APRS-IS gateway | REV1A | **[Open iGATE](./UV-K5%20IGATE/)** |
+| **UV-K5 DIGIPEATER** | UV-K5 only | Standalone APRS RF digipeater | Normal REV1G / Standalone REV1H | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
+| **UV-K5 iGATE** | UV-K5 + ESP32 | RF ↔ APRS-IS gateway | Normal REV1A / Standalone REV1B | **[Open iGATE](./UV-K5%20IGATE/)** |
 
 ---
 
@@ -29,7 +29,7 @@ Main features:
 - Normal and Standalone variants
 - Position beacon
 - TOCALL: `APZUAG`
-- REV1G has been field-tested in standalone operation
+- REV1G RF engine has been field-tested; latest dedicated Standalone revision is **REV1H** (build/CRC verified, hardware field test pending)
 
 **Documentation and firmware:**
 
@@ -89,10 +89,10 @@ Local APRS RF station
 
 ### 1. Flash the UV-K5
 
-Choose one of the supplied REV1A firmware variants:
+Choose the required UV-K5 variant:
 
-- **REV1A Normal** — enter APRS/iGate mode manually, normally with **Long F2**
-- **REV1A Standalone** — dedicated iGate mode starts automatically after power-on
+- **REV1A Normal** — enter APRS/iGate mode manually, normally with **Long F2**; field-tested RF → APRS-IS baseline
+- **REV1B Standalone** — dedicated iGate mode starts automatically after power-on and adds editable APRS Object, comment and symbol settings
 
 Firmware and detailed instructions are in:
 
@@ -160,7 +160,24 @@ For **REV1A Normal**:
 3. The selected VFO is used and Dual Watch is disabled while APRS mode is active.
 4. The ESP32 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
 
-For **REV1A Standalone**, the dedicated iGate runtime starts automatically after power-on.
+For **REV1B Standalone**, the dedicated iGate runtime starts automatically after power-on.
+
+### Latest Standalone-only APRS beacon controls
+
+Both **DIGI REV1H Standalone** and **iGATE REV1B Standalone** add menu controls for:
+
+- `BType` — Station / Object beacon
+- `ObjNam` — editable APRS Object Name, maximum 9 characters
+- `BComnt` — editable user comment suffix
+- `SymTbl` — APRS symbol table (`/` or `\`)
+- `Symbol` — editable APRS symbol code
+
+The identity prefix is mandatory and cannot be removed:
+
+- DIGI always transmits `NUSA DIGI` before the user comment
+- iGATE always transmits `NUSA IGATE` before the user comment
+
+These new Standalone revisions are **build verified and packed-CRC verified; hardware field testing is still pending**.
 
 ## iGate traffic behavior
 
@@ -202,8 +219,10 @@ This path is implemented and is pending full on-air field validation.
 
 ## Releases
 
-- **Digipeater REV1G:** [rev1g](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g)
-- **iGate REV1A:** [igate-rev1a](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
+- **Digipeater Normal REV1G:** [rev1g](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g)
+- **Digipeater Standalone REV1H:** [rev1h-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone)
+- **iGate Normal REV1A:** [igate-rev1a](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
+- **iGate Standalone REV1B:** [igate-rev1b-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone)
 
 ## License
 
