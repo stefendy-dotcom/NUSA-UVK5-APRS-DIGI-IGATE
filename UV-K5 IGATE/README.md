@@ -2,14 +2,14 @@
 
 [![iGate REV1A Downloads](https://img.shields.io/github/downloads/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/igate-rev1a/total?style=for-the-badge&logo=github&label=iGate%20REV1A%20Downloads)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
 
-**NUSA UV-K5 iGATE REV1A** turns a Quansheng UV-K5/UV-5K into the RF modem/radio side of a Wi-Fi APRS iGate. An ESP32 DevKit/WROOM-32 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
+**NUSA UV-K5 iGATE REV1A** turns a Quansheng UV-K5/UV-5K into the RF modem/radio side of a Wi-Fi APRS iGate. An ESP32 DevKit/WROOM-32 or ESP32-C3 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
 
 Two UV-K5 firmware variants are provided:
 
 1. **REV1A Normal** — APRS/iGate is entered manually, normally with Long F2.
 2. **REV1A Standalone** — dedicated iGate mode starts automatically after power-on.
 
-Both variants use the **same ESP32 firmware and the same UART protocol**.
+Both UV-K5 variants use the **same UART protocol**. Separate compiled ESP32 packages are provided for classic ESP32/WROOM-32 and ESP32-C3.
 
 ## Connection Diagram
 
@@ -134,6 +134,7 @@ The ESP32 does **not** need a different firmware.
 - REV1A Standalone UV-K5 firmware: **compile verified and packed CRC verified**.
 - REV1A Standalone: **not yet field-tested on hardware**.
 - IS -> RF APRS message path: implemented; pending on-air field validation.
+- ESP32-C3 package: **compile verified** with Arduino-ESP32 core 3.3.11 (`esp32:esp32:esp32c3`); hardware field test pending.
 
 ## Release files
 
@@ -141,11 +142,12 @@ The ESP32 does **not** need a different firmware.
 firmware/NUSA_UVK5_IGATE_REV1A.packed.bin
 firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
 esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip
+esp32/NUSA_UVK5_ESP32C3_IGATE_REV1A_BIN.zip
 FLASHING.md
 SHA256SUMS.txt
 ```
 
-The ESP32 ZIP contains exactly four compiled binary files:
+The classic ESP32 ZIP contains exactly four compiled binary files:
 
 ```text
 NUSA_UVK5_ESP32_IGATE_REV1A_bootloader.bin
@@ -154,7 +156,16 @@ NUSA_UVK5_ESP32_IGATE_REV1A_boot_app0.bin
 NUSA_UVK5_ESP32_IGATE_REV1A_firmware.bin
 ```
 
-See **[FLASHING.md](FLASHING.md)** for the exact ESP32 offsets and UV-K5 flashing procedure.
+The ESP32-C3 ZIP also contains exactly four compiled binary files:
+
+```text
+NUSA_UVK5_ESP32C3_IGATE_REV1A_bootloader.bin
+NUSA_UVK5_ESP32C3_IGATE_REV1A_partitions.bin
+NUSA_UVK5_ESP32C3_IGATE_REV1A_boot_app0.bin
+NUSA_UVK5_ESP32C3_IGATE_REV1A_firmware.bin
+```
+
+See **[FLASHING.md](FLASHING.md)** for the exact offsets. ESP32-C3 uses bootloader offset **0x0**.
 
 ## Correct UART connection
 
@@ -162,6 +173,14 @@ See **[FLASHING.md](FLASHING.md)** for the exact ESP32 offsets and UV-K5 flashin
 UV-K5 2.5 mm RING   (UART TX) -- 1 kΩ --> ESP32 GPIO16 / RX2
 UV-K5 2.5 mm SLEEVE (GND) -------------- ESP32 GND
 ESP32 GPIO17 / TX2 -- 1 kΩ --> UV-K5 3.5 mm SLEEVE (MIC-/PTT/UART RX)
+```
+
+ESP32-C3:
+
+```text
+UV-K5 2.5 mm RING   (UART TX) -- 1 kΩ --> ESP32-C3 GPIO4 / RX
+UV-K5 2.5 mm SLEEVE (GND) -------------- ESP32-C3 GND
+ESP32-C3 GPIO5 / TX -- 1 kΩ --> UV-K5 3.5 mm SLEEVE (MIC-/PTT/UART RX)
 ```
 
 Do not connect these to the ESP32:
