@@ -9,6 +9,60 @@ Tersedia dua varian firmware UV-K5:
 
 Kedua varian UV-K5 menggunakan **protokol UART yang sama**. Paket binary terpisah tersedia untuk ESP32 klasik/WROOM-32 dan ESP32-C3.
 
+## Terbaru khusus Standalone: REV1B
+
+**REV1A Normal tetap menjadi baseline iGate yang sudah berhasil diuji RF → ESP32 → APRS-IS. REV1B hanya merevisi firmware UV-K5 Standalone.**
+
+Firmware:
+
+```text
+firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
+```
+
+Release: [igate-rev1b-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone)
+
+Menu Standalone REV1B:
+
+```text
+TxPwr
+APRFq
+IS2RF
+IgCall
+IgSSID
+TxDly
+TxTail
+PosBcn
+BType
+ObjNam
+BComnt
+SymTbl
+Symbol
+BLat
+LatNS
+BLon
+LonEW
+```
+
+Fitur baru:
+
+- `BType`: Station atau APRS Object.
+- `ObjNam`: Object Name editable, maksimum 9 karakter; default `NUSAIGATE`.
+- `BComnt`: suffix comment editable, maksimum 16 karakter.
+- `SymTbl`: symbol table `/` atau `\`.
+- `Symbol`: kode symbol APRS editable.
+- Beacon Object memakai `*` dan pseudo timestamp `111111z`.
+- Comment TX **selalu diawali `NUSA IGATE`**; user hanya mengedit suffix-nya.
+
+Protokol UART UV-K5 ↔ ESP32 tetap sama. **ESP32 tidak memerlukan firmware baru** untuk revisi UV-K5 Standalone ini.
+
+Status REV1B Standalone: **build verified + packed CRC verified**, hardware/on-air field test masih pending.
+
+SHA256:
+
+```text
+d3b69b7c1cddd886248a6afceaca68987a30007ecca2aadba0ea0da7dfcb8c21
+```
+
 ## Diagram Koneksi
 
 ![Diagram Koneksi NUSA UV-K5 iGATE](Connection%20Diagram.png)
