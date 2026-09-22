@@ -1,6 +1,6 @@
-# Flashing Guide — NUSA UV-K5 iGATE REV1A
+# Flashing Guide — NUSA UV-K5 iGATE
 
-This guide covers both UV-K5 firmware variants and the ESP32 **4-BIN ZIP package**.
+This guide covers the REV1A Normal UV-K5 firmware, the REV1B Standalone UV-K5 firmware, and the ESP32 **4-BIN ZIP package**.
 
 # 1. Choose UV-K5 firmware
 
@@ -15,10 +15,10 @@ Use this when you want normal HT operation after power-on and enter APRS/iGate m
 ## Standalone / autostart
 
 ```text
-firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
+firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
 ```
 
-Use this for a dedicated iGate. After normal boot initialization it automatically locks runtime to VFO A and enters APRS/iGate.
+Use this for a dedicated iGate. It starts APRS/iGate automatically and uses the dedicated stored `APRFq` setting.
 
 Before flashing either UV-K5 firmware:
 
@@ -33,7 +33,13 @@ Official Quansheng support/download page:
 
 https://en.qsfj.com/support/downloads/3268
 
-For Standalone, set the desired APRS frequency on **VFO A before flashing or before the next reboot into standalone operation**. Standalone uses the stored VFO-A RX frequency and forces simplex APRS runtime.
+For REV1B Standalone, set the APRS frequency from:
+
+```text
+MENU → APRFq
+```
+
+Enter the frequency in 10 Hz units, for example `14439000` for 144.39000 MHz, then press MENU to save. On the first upgrade boot only, if no dedicated APRFq has been saved yet, the firmware inherits the existing VFO-A frequency. Standalone then uses its stored APRFq and forces simplex APRS runtime.
 
 # 2. ESP32 package — same for Normal and Standalone
 
@@ -98,16 +104,22 @@ Setelah power-on radio tetap normal. Masuk APRS/iGate secara manual, biasanya Lo
 ## Standalone
 
 ```text
-firmware/NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin
+firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
 ```
 
-Digunakan untuk iGate dedicated. Setelah boot, firmware otomatis menggunakan VFO A dan masuk APRS/iGate.
+Digunakan untuk iGate dedicated. Setelah boot, firmware otomatis masuk APRS/iGate dan menggunakan frekuensi khusus yang tersimpan pada `APRFq`.
 
-Sebelum menggunakan Standalone, set frekuensi APRS yang diinginkan pada **VFO A**. Standalone memakai frekuensi RX VFO A yang tersimpan dan memaksa APRS simplex saat runtime.
+Untuk REV1B Standalone buka:
+
+```text
+MENU → APRFq
+```
+
+Masukkan frekuensi dalam satuan 10 Hz, contoh `14439000` untuk 144.39000 MHz, lalu tekan MENU untuk menyimpan. Hanya pada boot upgrade pertama, jika APRFq belum pernah disimpan, firmware mengambil nilai awal dari VFO-A. Setelah itu Standalone memakai APRFq tersimpan dan memaksa APRS simplex saat runtime.
 
 # 4. Bahasa Indonesia — ESP32
 
-Firmware ESP32 **sama** untuk Normal dan Standalone.
+Firmware ESP32 **tetap sama** untuk REV1A Normal dan REV1B Standalone; protokol UART tidak berubah.
 
 Extract:
 
