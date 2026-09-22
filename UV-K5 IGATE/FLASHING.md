@@ -135,3 +135,55 @@ Web      : http://192.168.4.1/
 # 5. Verify downloads
 
 Compare SHA256 values with `SHA256SUMS.txt` before flashing.
+
+
+# 6. ESP32-C3 package
+
+Use:
+
+```text
+esp32/NUSA_UVK5_ESP32C3_IGATE_REV1A_BIN.zip
+```
+
+This package is for ESP32-C3 boards that expose GPIO4 and GPIO5. UART to the UV-K5 is **UART1, 38400 8N1**:
+
+```text
+GPIO4 = RX from UV-K5 UART TX
+GPIO5 = TX to UV-K5 UART RX
+```
+
+The ZIP contains exactly four files:
+
+```text
+NUSA_UVK5_ESP32C3_IGATE_REV1A_bootloader.bin
+NUSA_UVK5_ESP32C3_IGATE_REV1A_partitions.bin
+NUSA_UVK5_ESP32C3_IGATE_REV1A_boot_app0.bin
+NUSA_UVK5_ESP32C3_IGATE_REV1A_firmware.bin
+```
+
+ESP32-C3 flash offsets verified from the Arduino build:
+
+```text
+0x0     bootloader
+0x8000  partitions
+0xE000  boot_app0
+0x10000 firmware
+```
+
+Example:
+
+```text
+python -m esptool --chip esp32c3 --port COM5 --baud 460800 erase-flash
+
+python -m esptool --chip esp32c3 --port COM5 --baud 460800 write-flash \
+  0x0     NUSA_UVK5_ESP32C3_IGATE_REV1A_bootloader.bin \
+  0x8000  NUSA_UVK5_ESP32C3_IGATE_REV1A_partitions.bin \
+  0xE000  NUSA_UVK5_ESP32C3_IGATE_REV1A_boot_app0.bin \
+  0x10000 NUSA_UVK5_ESP32C3_IGATE_REV1A_firmware.bin
+```
+
+## Bahasa Indonesia — ESP32-C3
+
+Paket ini untuk board ESP32-C3 yang menyediakan GPIO4 dan GPIO5. Gunakan GPIO4 sebagai RX dari UV-K5 dan GPIO5 sebagai TX ke UV-K5. Protokol UART tetap **38400 8N1** dan kompatibel dengan firmware UV-K5 iGate Normal maupun Standalone.
+
+Perhatikan bahwa address bootloader C3 adalah **0x0**, berbeda dengan ESP32 klasik yang menggunakan **0x1000**.
