@@ -1,5 +1,7 @@
 # NUSA UV-K5 APRS Digipeater — Bahasa Indonesia
 
+> ✅ **Persistence Fix1 — 23 September 2026:** masalah perubahan koordinat setelah power-cycle dan penyimpanan Object Name/Comment Standalone sudah diperbaiki dan **berhasil diuji pada hardware UV-K5 nyata**. Setelah upgrade Standalone, set dan simpan ulang `ObjNam` serta `BComnt` satu kali.
+
 ## Terbaru khusus Standalone: REV1H
 
 **REV1G Normal tetap menjadi baseline RF yang sudah field-tested. REV1H hanya merevisi versi Standalone.**
@@ -10,7 +12,7 @@ Firmware:
 firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
 ```
 
-Release: [rev1h-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone)
+Release: [rev1h-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone-fix1)
 
 Menu APRS Standalone REV1H:
 
@@ -54,7 +56,7 @@ Status REV1H Standalone: **build verified + packed CRC verified**, tetapi **belu
 SHA256:
 
 ```text
-228ceffff79247095cbc495976c13f07f8d90f10828409360dbce96b3e21fea2
+d567603ced9ef646109e2049218ab65d71028ec7572b09f33d12ca27e87e47b2
 ```
 
 ---
