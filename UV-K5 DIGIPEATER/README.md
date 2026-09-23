@@ -1,6 +1,6 @@
 # NUSA UV-K5 APRS Digipeater
 
-# Latest Standalone: REV1H
+# Latest: REV1G Fix1 / REV1H Standalone Fix1
 
 > **REV1G Normal remains the field-tested RF baseline. REV1H is a Standalone-only feature revision.**
 
@@ -10,7 +10,7 @@ Firmware:
 firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
 ```
 
-Release: **[rev1h-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone)**
+Release: **[rev1h-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone-fix1)**
 
 REV1H Standalone adds these dedicated APRS controls while retaining the REV1G Bell-202 / AX.25 digipeater engine:
 
@@ -47,13 +47,28 @@ Example with user suffix `WAMENA`:
 ...#NUSA DIGI WAMENA
 ```
 
-**Validation status:** REV1H Standalone is **build verified and packed-CRC verified**. Hardware/on-air field testing of this new revision is still pending.
+**Validation status:** REV1H Standalone Fix1 is **build verified, packed-CRC verified, and its EEPROM persistence fix has been tested successfully on real UV-K5 hardware**.
 
 SHA256:
 
 ```text
-228ceffff79247095cbc495976c13f07f8d90f10828409360dbce96b3e21fea2
+d567603ced9ef646109e2049218ab65d71028ec7572b09f33d12ca27e87e47b2
 ```
+
+---
+
+## Persistence Fix1 — 23 September 2026
+
+The current REV1G Normal and REV1H Standalone binaries include the field-tested power-cycle persistence fix:
+
+- APRS configuration is read using two 8-byte EEPROM pages.
+- Saved coordinates include an integrity check while remaining compatible with legacy coordinate data.
+- REV1H Standalone now writes the complete Object/Comment metadata as five 8-byte pages with CRC16 protection.
+- Full 9-character Object Name and 16-character Comment survive power cycles.
+
+After upgrading REV1H Standalone, **enter and save Object Name and Comment once**. The previous firmware never stored the missing bytes, so an old truncated value cannot be recovered automatically.
+
+See **[Persistence Fix1 details](../PERSISTENCE_FIX1.md)**.
 
 ---
 
@@ -102,8 +117,8 @@ firmware/
 Current APZUAG beacon builds:
 
 ```text
-REV1G SHA256       : b0d4331021a74450aca2aac70925a1e8b8aa04d4247bcc697d7f8225711128c8
-Standalone SHA256  : 228ceffff79247095cbc495976c13f07f8d90f10828409360dbce96b3e21fea2
+REV1G SHA256       : 51b89ff9bb9bdbf141b44f0ffc362a2e0cd9007d4ece376c5d863209a3befa5f
+Standalone SHA256  : d567603ced9ef646109e2049218ab65d71028ec7572b09f33d12ca27e87e47b2
 Beacon TOCALL      : APZUAG
 ```
 ```
