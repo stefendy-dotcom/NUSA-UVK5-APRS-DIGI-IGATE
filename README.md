@@ -1,257 +1,288 @@
-# NUSA UV-K5 APRS
-
-## 📊 Cumulative Firmware Downloads
+# NUSA UV-K5 APRS: Digipeater & iGate
 
 [![DIGI Normal Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Fdigi-normal.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases)
 [![DIGI Standalone Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Fdigi-standalone.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases)
-
 [![iGATE Normal Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Figate-normal.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases)
 [![iGATE Standalone Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Figate-standalone.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases)
-
 [![ESP32 iGATE Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Fesp32-igate.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases)
 [![ESP32-C3 iGATE Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Fesp32c3-igate.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases)
-
 [![TOTAL Firmware Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Ftotal.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases)
 
-> These counters are **cumulative across all GitHub Release assets**, from the first public release through the latest release. They update automatically after release events and are rechecked every hour. Files such as `SHA256SUMS.txt` are not counted.
+Open-source APRS firmware ecosystem for the **Quansheng UV-K5 / UV-K6 / UV-5K** series, developed by **YF9UAG, Indonesia**.
 
-APRS projects for the **Quansheng UV-K5 / UV-5K**, developed by **YF9UAG, Indonesia**.
+> ✅ **Persistence Fix1 Maintenance Release:** Power-cycle EEPROM persistence fixes for DIGI (Normal/Standalone) and iGATE (Normal/Standalone) have been **tested successfully on real hardware**. See **[PERSISTENCE_FIX1.md](./PERSISTENCE_FIX1.md)**.
 
-> ✅ **Persistence Fix1 — 23 September 2026:** power-cycle persistence fixes for DIGI Normal/Standalone and iGATE Normal/Standalone have been **tested successfully on real hardware**. See **[PERSISTENCE_FIX1.md](./PERSISTENCE_FIX1.md)**.
+---
 
-> There are **two different projects** in this repository.  
-> The Digipeater can run on the UV-K5 by itself.  
-> The iGate uses a **UV-K5 + ESP32**.
+## 📑 Project Navigation & Quick Matrix
 
-## Choose your project
+This repository houses two complete APRS implementations:
 
-| Project | Hardware | Purpose | Current version | Documentation |
+```mermaid
+flowchart TD
+    subgraph "1. UV-K5 DIGIPEATER (Standalone HT)"
+        D1["Quansheng UV-K5 / UV-K6 / V3"]
+        D1 -->|"Bell-202 AX.25 1200 baud\nHardware Timer Pacing"| D2["APRS RF Network"]
+        D1 -->|"WIDE2 n-N Digipeater\nStation / Object Beacon"| D2
+    end
+
+    subgraph "2. UV-K5 + ESP32 iGATE (Hybrid Gateway)"
+        G1["Quansheng UV-K5 (RF Modem)"] <-->|"UART 38400 8N1"| G2["ESP32 / ESP32-C3"]
+        G2 <-->|"Wi-Fi / TCP (Port 14580)"| G3["APRS-IS Servers"]
+        G2 --- G4["Web Config Dashboard\n(http://192.168.4.1)"]
+    end
+```
+
+| Project | Target Hardware | Functionality | Current Stable Version | Quick Link |
 |---|---|---|---|---|
-| **UV-K5 DIGIPEATER** | UV-K5 only | Standalone APRS RF digipeater | Normal REV1G Fix1 / Standalone REV1H Fix1 | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
-| **UV-K5 V3 DIGIPEATER** | UV-K5 V3 only | Standalone APRS RF digipeater (V3 hardware) | Normal REV1A | **[Open UV-K5-V3](./firmware/UV-K5-V3/)** |
-| **UV-K5 iGATE** | UV-K5 + ESP32 | RF ↔ APRS-IS gateway | Normal REV1A Fix1 / Standalone REV1B Fix1 | **[Open iGATE](./UV-K5%20IGATE/)** |
+| **UV-K5 DIGIPEATER** | Quansheng UV-K5 / UV-K6 | On-radio APRS Digipeater (Normal & Autostart Standalone) | Normal REV1G Fix1 / Standalone REV1H Fix1 | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
+| **UV-K5 V3 DIGIPEATER** | Quansheng UV-K5 V3 Hardware | Dedicated Normal Digipeater for V3 PCB revision | Normal REV1A | **[Open UV-K5-V3](./firmware/UV-K5-V3/)** |
+| **UV-K5 + ESP32 iGATE** | UV-K5 + ESP32 / ESP32-C3 | Bidirectional RF ↔ APRS-IS Internet Gateway | Normal REV1A Fix1 / Standalone REV1B Fix1 | **[Open iGATE](./UV-K5%20IGATE/)** |
 
 ---
 
-# UV-K5 DIGIPEATER
+# 1. UV-K5 DIGIPEATER
 
-The Digipeater firmware runs directly on the Quansheng UV-K5 without an ESP32.
+The Digipeater firmware turns a Quansheng UV-K5 handheld radio into a dedicated 1200 baud APRS digipeater without needing any external microcontroller.
 
-Main features:
+### Key Features
+* **Modem Engine:** Bell 202 AFSK (1200 Hz mark / 2200 Hz space) at 1200 baud with hardware-timer-based (`TIMER_BASE0`) deterministic TX bit pacing.
+* **Digipeater Routing:** Standard AX.25 UI-frame digipeating with **WIDE2 n-N** path substitution and duplicate packet suppression (~20s).
+* **Position & Object Beaconing:** Station position beacons or APRS Object beacons (`*` alive flag, `111111z` pseudo-timestamp) with TOCALL: `APZUAG`.
+* **Fix1 EEPROM Persistence:** Full 9-character Object Name (`ObjNam`), 16-character Comment suffix (`BComnt`), and APRS Symbol settings stored safely across power cycles using CRC16 NAP3 formatting.
 
-- Bell 202 / AX.25 APRS 1200 baud
-- WIDE2 n-N digipeating
-- Normal and Standalone variants
-- Position beacon
-- TOCALL: `APZUAG`
-- REV1G RF engine has been field-tested; latest dedicated Standalone revision is **REV1H Fix1**; the EEPROM persistence fix has been field-tested successfully
+### Normal vs. Standalone Digipeater Variants
 
-**Documentation and firmware:**
+| Feature | REV1G Normal | REV1H Standalone Fix1 (Latest) |
+|---|---|---|
+| **Primary Use** | Flexible handheld radio + occasional APRS | 24/7 dedicated unattended digipeater appliance |
+| **APRS Startup** | Manual (enter via **Long F2**) | **Automatic autostart** on radio power-on |
+| **VFO Mode** | Normal dual VFO flexibility | Locked to VFO A simplex operation |
+| **APRS Frequency** | Uses current VFO frequency | Dedicated **`APRFq`** keypad menu setting |
+| **Beacon Types** | Station position beacon | Selectable **Station** or **APRS Object** (`BType`) |
+| **Custom Symbol** | Fixed | Full Symbol Table (`SymTbl`) & Code (`Symbol`) entry |
+| **Object Name** | N/A | Editable 9-character Object Name (`ObjNam`) |
+| **Comment Suffix** | Fixed `NUSA DIGI` | Mandatory `NUSA DIGI` prefix + editable 16-char suffix (`BComnt`) |
 
-### [UV-K5 DIGIPEATER →](./UV-K5%20DIGIPEATER/)
+### Digipeater Menu Reference (REV1H Standalone)
 
-**Release:**
+| Menu Item | Description | Example / Range |
+|---|---|---|
+| `TxPwr` | RF Transmit Power | LOW / MID / HIGH |
+| `APRFq` | Dedicated APRS Frequency (in 10 Hz units) | `14439000` (144.390 MHz) / `14480000` (144.800 MHz) |
+| `DgCall` | Digipeater Callsign | e.g., `9M2PJU` / `YF9UAG` |
+| `DgSSID` | Digipeater SSID | `0` to `15` (Standard: `3` or `4`) |
+| `DgDly` | TX Preamble Delay | `900` ms (recommended) |
+| `DgTail` | TX Tail Duration | `60` ms |
+| `PosBcn` | Beacon Timer Interval | OFF / Configurable Interval |
+| `BType` | Beacon Type | `Station` / `Object` |
+| `ObjNam` | APRS Object Name (when `BType=Object`) | up to 9 alphanumeric characters (e.g. `NUSA-DIGI`) |
+| `BComnt` | User Comment Suffix | up to 16 characters (e.g. `KUALA LUMPUR`) |
+| `SymTbl` | APRS Symbol Table | `/` (Primary) or `\` (Alternate) |
+| `Symbol` | APRS Symbol Code | `#` (Digipeater), `s` (Ship), `&` (Gateway), etc. |
+| `BLat` / `LatNS` | Beacon Latitude & North/South | Deg/Min/Sec coordinates + N/S |
+| `BLon` / `LonEW` | Beacon Longitude & East/West | Deg/Min/Sec coordinates + E/W |
 
-### [Download Normal REV1G →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g-fix1)
+### Flashing the Digipeater Firmware
 
-### [Download Standalone REV1H →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone-fix1)
+1. **Download the Firmware:**
+   * **Normal (REV1G Fix1):** [`NUSA_UVK5_APRS_DIGI_REV1G.packed.bin`](./UV-K5%20DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1G.packed.bin)
+   * **Standalone (REV1H Fix1):** [`NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin`](./UV-K5%20DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin)
+   * **UV-K5 V3 Hardware:** [`NUSA_UVK5_V3_APRS_DIGI_REV1A_NORMAL.bin`](./firmware/UV-K5-V3/NUSA_UVK5_V3_APRS_DIGI_REV1A_NORMAL.bin)
+2. **Put UV-K5 into Bootloader Mode:**
+   * Turn the radio off.
+   * Hold the **PTT** button while turning the power knob on until the top flashlight LED turns on steady.
+3. **Flash:**
+   * For `.packed.bin` files: Use the official Quansheng updater or compatible web flashers.
+   * For `.bin` files (V3): Use `k5prog` or a browser web flasher supporting raw binary flashing.
 
 ---
 
-# UV-K5 + ESP32 iGATE
+# 2. UV-K5 + ESP32 iGATE
 
-**NUSA UV-K5 iGATE REV1A** uses the UV-K5 as the Bell 202 / AX.25 RF modem and an ESP32 as the Wi-Fi/APRS-IS gateway.
-
-```text
-APRS RF
-   |
-   v
-Quansheng UV-K5
-Bell 202 / AX.25 1200 baud
-   |
-   | UART 38400 8N1
-   v
-ESP32
-   |
-   | Wi-Fi / TCP
-   v
-APRS-IS
-```
-
-For eligible APRS messages, the return path is also implemented:
+The iGate setup combines the Quansheng UV-K5 as the RF transceiver/modem with an ESP32 or ESP32-C3 microcontroller connected to Wi-Fi and the APRS-IS backbone.
 
 ```text
-APRS-IS
-   |
-   v
-ESP32 filtering / anti-loop checks
-   |
-   | UART
-   v
-UV-K5
-   |
-   v
-Local APRS RF station
+               APRS RF (144.390 MHz / 144.800 MHz)
+                              ▲
+                              │ RF (Bell-202 AX.25)
+                              ▼
+                   ┌─────────────────────┐
+                   │   Quansheng UV-K5   │
+                   │    (Radio Modem)    │
+                   └──────────┬──────────┘
+                              │
+                              │ UART 38400 8N1
+                              │ (2.5mm Ring / 3.5mm Sleeve)
+                              ▼
+                   ┌─────────────────────┐
+                   │   ESP32 / ESP32-C3  │
+                   │  (Wi-Fi / Gateway)  │
+                   └──────────┬──────────┘
+                              │
+                              │ TCP / Wi-Fi (Port 14580)
+                              ▼
+                   ┌─────────────────────┐
+                   │    APRS-IS Server   │
+                   │ (rotate.aprs2.net)  │
+                   └─────────────────────┘
 ```
 
-## What you need for the iGate
+### Hardware Requirements
+* Quansheng UV-K5, UV-K6, or UV-5K.
+* ESP32 DevKit / WROOM-32 board OR ESP32-C3 board.
+* Kenwood 2-pin K-type programming connector cable.
+* Two $1\text{ k}\Omega$ current-limiting resistors.
+* Snap-on ferrite choke (Type 43 or 31).
 
-- Quansheng UV-K5 / UV-5K
-- ESP32 DevKit / WROOM-32, or supported ESP32-C3 build
-- Wi-Fi Internet connection
-- Correct UV-K5 ↔ ESP32 UART interface
-- Valid APRS callsign and APRS-IS passcode
+### Wiring & Connection Pinout
 
-## iGate quick start
+![iGate Connection Diagram](./UV-K5%20IGATE/Connection%20Diagram.png)
 
-### 1. Flash the UV-K5
+#### Classic ESP32 / WROOM-32 Pinout
 
-Choose the required UV-K5 variant:
+| UV-K5 Kenwood Plug | UV-K5 Signal | Series Resistor | ESP32 GPIO Pin |
+|---|---|---|---|
+| **2.5 mm RING** | Radio UART TX (Output) | $1\text{ k}\Omega$ | **GPIO 16 (RX2)** |
+| **2.5 mm SLEEVE** | Ground | Direct Wire | **GND** |
+| **3.5 mm SLEEVE** | Radio UART RX / PTT (Input) | $1\text{ k}\Omega$ | **GPIO 17 (TX2)** |
 
-- **REV1A Normal** — enter APRS/iGate mode manually, normally with **Long F2**; field-tested RF → APRS-IS baseline
-- **REV1B Standalone** — dedicated iGate mode starts automatically after power-on and adds editable APRS Object, comment and symbol settings
+#### ESP32-C3 Pinout
 
-Firmware and detailed instructions are in:
+| UV-K5 Kenwood Plug | UV-K5 Signal | Series Resistor | ESP32-C3 Pin |
+|---|---|---|---|
+| **2.5 mm RING** | Radio UART TX | $1\text{ k}\Omega$ | **GPIO 4 (RX1)** |
+| **2.5 mm SLEEVE** | Ground | Direct Wire | **GND** |
+| **3.5 mm SLEEVE** | Radio UART RX | $1\text{ k}\Omega$ | **GPIO 5 (TX1)** |
 
-**[UV-K5 iGATE documentation →](./UV-K5%20IGATE/)**
-
-### 2. Flash the ESP32
-
-The GitHub release provides compiled ESP32 ZIP packages. The classic ESP32 package contains the four binaries required for flashing:
-
-```text
-bootloader.bin
-partitions.bin
-boot_app0.bin
-firmware.bin
-```
-
-Exact flash offsets and ESP32-C3 instructions:
-
-**[FLASHING.md →](./UV-K5%20IGATE/FLASHING.md)**
-
-### 3. Connect the UV-K5 to the ESP32
-
-Classic ESP32 / WROOM-32:
-
-```text
-UV-K5 2.5 mm RING   (UART TX) -- 1 kΩ --> ESP32 GPIO16 / RX2
-UV-K5 2.5 mm SLEEVE (GND) -------------- ESP32 GND
-ESP32 GPIO17 / TX2 -- 1 kΩ --> UV-K5 3.5 mm SLEEVE (MIC-/PTT/UART RX)
-```
-
-Do **not** connect:
-
-```text
-UV-K5 2.5 mm TIP  = SPK+
-UV-K5 3.5 mm RING = MIC+
-UV-K5 3.5 mm TIP  = radio V+
-```
-
-The 3.5 mm TIP carries radio supply voltage and must not be connected to an ESP32 GPIO or ground.
-
-**Connection diagram:**
-
-### [View Connection Diagram →](./UV-K5%20IGATE/Connection%20Diagram.png)
-
-### Hardware, Power & RFI Protection Tips
-
-1. **RFI Protection:** Transmitting 4W–5W VHF/UHF RF immediately adjacent to an unshielded ESP32 can induce RF into UART lines and reset the microcontroller.
-   - Install a snap-on ferrite core (Type 43 or 31) on the Kenwood interface cable.
-   - Keep the ESP32 board and wiring at least 20–30 cm away from the radio's antenna.
-2. **24/7 Station Power:**
-   - Avoid powering the UV-K5 continuously via its built-in USB-C port during 24/7 digi/iGate operation (the internal charge circuit can overheat).
-   - Use a dedicated 12V-to-8.4V battery eliminator in the battery compartment for permanent base station setups.
-
-### 4. Configure the ESP32
-
-After flashing:
-
-1. Connect to Wi-Fi AP **NUSA-IGATE**
-2. Password: **12345678**
-3. Open **http://192.168.4.1/**
-4. Configure:
-   - your Wi-Fi
-   - iGate callsign and SSID
-   - APRS-IS server
-   - APRS-IS passcode
-   - position / beacon settings as required
-
-### 5. Start the iGate
-
-For **REV1A Normal**:
-
-1. Select the VFO and APRS frequency on the UV-K5.
-2. Long-press **F2** to enter APRS/iGate mode.
-3. The selected VFO is used and Dual Watch is disabled while APRS mode is active.
-4. The ESP32 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
-
-For **REV1B Standalone**, the dedicated iGate runtime starts automatically after power-on.
-
-### Latest Standalone-only APRS beacon controls
-
-Both **DIGI REV1H Standalone** and **iGATE REV1B Standalone** add menu controls for:
-
-- `BType` — Station / Object beacon
-- `ObjNam` — editable APRS Object Name, maximum 9 characters
-- `BComnt` — editable user comment suffix
-- `SymTbl` — APRS symbol table (`/` or `\`)
-- `Symbol` — editable APRS symbol code
-
-The identity prefix is mandatory and cannot be removed:
-
-- DIGI always transmits `NUSA DIGI` before the user comment
-- iGATE always transmits `NUSA IGATE` before the user comment
-
-These Standalone builds are **build verified, packed-CRC verified, and the Fix1 EEPROM persistence changes have been tested successfully on real UV-K5 hardware**.
-
-## iGate traffic behavior
-
-### RF → APRS-IS
-
-RF packets decoded by the UV-K5 are sent to the ESP32 and then gated to APRS-IS with duplicate and loop protection.
-
-This path has been **field-tested successfully** on REV1A Normal.
-
-### APRS-IS → RF
-
-The return path is intentionally restricted.
-
-An APRS-IS message may be sent to RF only when its target has been heard **directly on RF within the last 30 minutes**, using exact callsign + SSID matching and additional anti-loop checks.
-
-This path is implemented and is pending full on-air field validation.
-
-## iGate validation status
-
-- REV1A Normal UV-K5 firmware: compile verified and packed CRC verified
-- Corrected UV-K5 ↔ ESP32 UART interface: **field-tested successfully**
-- REV1A Normal RF → ESP32 → APRS-IS: **field-tested successfully**
-- REV1B Standalone: compile/CRC verified; Fix1 EEPROM persistence tested successfully on real hardware
-- IS → RF APRS message path: implemented; on-air field validation pending
-- ESP32-C3 package: compile verified; hardware field test pending
-
-## iGate documentation
-
-- **[English README](./UV-K5%20IGATE/README.md)**
-- **[README Bahasa Indonesia](./UV-K5%20IGATE/README_ID.md)**
-- **[Flashing instructions](./UV-K5%20IGATE/FLASHING.md)**
-- **[Connection diagram](./UV-K5%20IGATE/Connection%20Diagram.png)**
-
-**Release:**
-
-### [Download iGate Normal REV1A →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a-fix1)
-
-### [Download iGate Standalone REV1B →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone-fix1)
+> [!CAUTION]
+> **DO NOT CONNECT THE 3.5 mm TIP!**  
+> The 3.5 mm TIP carries full battery supply voltage ($+7.4\text{V} \sim +8.4\text{V}$). Connecting it to any ESP32 GPIO or ground will permanently destroy the microcontroller.
+> * 2.5 mm TIP = Speaker Audio (Leave Disconnected)
+> * 3.5 mm RING = Mic Bias (Leave Disconnected)
+> * 3.5 mm TIP = Radio V+ (Leave Disconnected)
 
 ---
 
-## Releases
+### ESP32 Flashing Instructions
 
-- **Digipeater Normal REV1G Fix1:** [rev1g-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g-fix1)
-- **Digipeater Standalone REV1H Fix1:** [rev1h-standalone-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone-fix1)
-- **iGate Normal REV1A Fix1:** [igate-rev1a-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a-fix1)
-- **iGate Standalone REV1B Fix1:** [igate-rev1b-standalone-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone-fix1)
+The precompiled ESP32 4-BIN ZIP archives are located in [`UV-K5 IGATE/esp32/`](./UV-K5%20IGATE/esp32/):
 
-## License
+#### A. Classic ESP32 (WROOM-32 / Dev Module)
+Extract [`NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip`](./UV-K5%20IGATE/esp32/NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip) and flash using `esptool`:
 
-See the repository-level **LICENSE** file. Project-specific attribution and documentation are stored inside each project folder.
+```bash
+python -m esptool --chip esp32 --port /dev/ttyUSB0 --baud 460800 erase-flash
+
+python -m esptool --chip esp32 --port /dev/ttyUSB0 --baud 460800 write-flash \
+  0x1000  NUSA_UVK5_ESP32_IGATE_REV1A_bootloader.bin \
+  0x8000  NUSA_UVK5_ESP32_IGATE_REV1A_partitions.bin \
+  0xE000  NUSA_UVK5_ESP32_IGATE_REV1A_boot_app0.bin \
+  0x10000 NUSA_UVK5_ESP32_IGATE_REV1A_firmware.bin
+```
+
+#### B. ESP32-C3 RISC-V Module
+Extract [`NUSA_UVK5_ESP32C3_IGATE_REV1A_BIN.zip`](./UV-K5%20IGATE/esp32/NUSA_UVK5_ESP32C3_IGATE_REV1A_BIN.zip) and flash using `esptool`:
+
+```bash
+python -m esptool --chip esp32c3 --port /dev/ttyUSB0 --baud 460800 erase-flash
+
+python -m esptool --chip esp32c3 --port /dev/ttyUSB0 --baud 460800 write-flash \
+  0x0     NUSA_UVK5_ESP32C3_IGATE_REV1A_bootloader.bin \
+  0x8000  NUSA_UVK5_ESP32C3_IGATE_REV1A_partitions.bin \
+  0xE000  NUSA_UVK5_ESP32C3_IGATE_REV1A_boot_app0.bin \
+  0x10000 NUSA_UVK5_ESP32C3_IGATE_REV1A_firmware.bin
+```
+
+---
+
+### ESP32 Web Dashboard Configuration
+
+1. Power on the flashed ESP32.
+2. Connect to the Wi-Fi Access Point:
+   * **SSID:** `NUSA-IGATE`
+   * **Password:** `12345678`
+3. Open your browser to **`http://192.168.4.1/`**.
+4. Configure your station:
+   * **Wi-Fi SSID & Password:** Your local home/repeater network credentials.
+   * **APRS Callsign & SSID:** e.g., `9M2PJU-10` or `YF9UAG-10`.
+   * **APRS-IS Passcode:** Your 5-digit APRS-IS validation code.
+   * **APRS-IS Server:** `rotate.aprs2.net` (Port: `14580`).
+   * **Beacon Settings:** Coordinates, beacon comment, interval, and symbol.
+5. Save and restart the ESP32.
+
+---
+
+## ⚡ Hardware, Power & RFI Protection Guidelines
+
+> [!IMPORTANT]
+> When operating an iGate or Digipeater in permanent 24/7 service, follow these essential hardware practices:
+
+1. **RF Interference (RFI) Mitigation:**
+   * Transmitting at 4W–5W VHF/UHF immediately adjacent to an unshielded ESP32 board can induce high RF currents into the UART wires, causing MCU crashes, Wi-Fi drops, or serial corruptions.
+   * **Snap-on Ferrite Choke:** Clip a Type 43 or Type 31 ferrite core onto the Kenwood cable as close to the radio body as possible.
+   * **Antenna Separation:** Maintain at least $20\text{ cm} \sim 30\text{ cm}$ physical separation between the radio's antenna and the ESP32 module.
+2. **24/7 Base Station Powering:**
+   * **Do NOT use the UV-K5 onboard USB-C port** for continuous 24/7 power. The internal charge controller generates significant heat and is not rated for continuous high-duty-cycle TX/RX.
+   * **Recommended Power Source:** Use a dedicated 12V-to-8.4V battery eliminator inserted into the radio's battery compartment powered by a clean, regulated DC supply.
+3. **Stable ESP32 Power:**
+   * Power the ESP32 with a dedicated 5V 1A+ DC supply with adequate bulk capacitance to avoid brownout resets when Wi-Fi TX bursts occur simultaneously with radio UART activity.
+
+---
+
+## 🔒 SHA256 Checksums Table
+
+| File | Subdirectory | SHA256 Hash |
+|---|---|---|
+| `NUSA_UVK5_APRS_DIGI_REV1G.packed.bin` | `UV-K5 DIGIPEATER/firmware/` | `51b89ff9bb9bdbf141b44f0ffc362a2e0cd9007d4ece376c5d863209a3befa5f` |
+| `NUSA_UVK5_APRS_DIGI_REV1G_STANDALONE.packed.bin` | `UV-K5 DIGIPEATER/firmware/` | `70202070d8373dc4a383800cc1bfd6cf4e6aae79cc73e52efc7828484fd48813` |
+| `NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin` | `UV-K5 DIGIPEATER/firmware/` | `d567603ced9ef646109e2049218ab65d71028ec7572b09f33d12ca27e87e47b2` |
+| `NUSA_UVK5_V3_APRS_DIGI_REV1A_NORMAL.bin` | `firmware/UV-K5-V3/` | `248f9835e34d5b084966f9802c2921e2d08ce957093d14e499b5fdf8f867665f` |
+| `NUSA_UVK5_IGATE_REV1A.packed.bin` | `UV-K5 IGATE/firmware/` | `675b32bbda58a71d333af5b0fa4e8ec7d8eb664f25e672712c701573a74855a7` |
+| `NUSA_UVK5_IGATE_REV1A_STANDALONE.packed.bin` | `UV-K5 IGATE/firmware/` | `be97c352f1b0a48081b4bfdf78791f088439627d69b8ad7d75f0042720d92253` |
+| `NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin` | `UV-K5 IGATE/firmware/` | `0080f7ea35f2e84489c341c3987aeabc9eea04cc00e1c8edbe9dd5c68b098460` |
+| `NUSA_UVK5_ESP32_IGATE_REV1A_BIN.zip` | `UV-K5 IGATE/esp32/` | `cedb74e3bae16b0789b4135c966049a61c8944219ababb0da35dc8d7aace6fcc` |
+| `NUSA_UVK5_ESP32C3_IGATE_REV1A_BIN.zip` | `UV-K5 IGATE/esp32/` | `c88e93f0744ef3786f3312b0aa5287b150a2920222ee76bcfdf9fa33fc13721e` |
+
+---
+
+## ❓ Frequently Asked Questions & Troubleshooting
+
+<details>
+<summary><b>Q: My settings (Object Name / Comment) are lost after turning the radio off and on.</b></summary>
+Ensure you have flashed the Fix1 release (REV1H Standalone Fix1 or REV1B Standalone Fix1). In older releases, EEPROM writes were limited to 1 page (8 bytes). Fix1 expands metadata storage to 5 pages with CRC16 NAP3 protection. After flashing Fix1, enter your settings in the menu once and save to write the full 40-byte record.
+</details>
+
+<details>
+<summary><b>Q: My ESP32 resets or drops Wi-Fi whenever the radio transmits.</b></summary>
+This is caused by Radio Frequency Interference (RFI) coupling into the UART lines or power supply.
+1. Add a Type 43 snap-on ferrite core to the Kenwood programming cable.
+2. Move the ESP32 at least 20–30 cm away from the radio antenna.
+3. Ensure you have the 1 kΩ series resistors on both UART lines (TX & RX).
+</details>
+
+<details>
+<summary><b>Q: How do I enter APRS mode on Normal firmware?</b></summary>
+On REV1G Normal (Digi) or REV1A Normal (iGate), long-press the <b>F2</b> side key. If F2 Long is not configured for APRS, adjust it in the radio settings menu. On Standalone firmware (REV1H/REV1B), the radio enters APRS mode automatically at boot.
+</details>
+
+---
+
+## 📚 Documentation & Releases
+
+* **Digipeater Documentation:** [English Guide](./UV-K5%20DIGIPEATER/README.md) • [Panduan Bahasa Indonesia](./UV-K5%20DIGIPEATER/README_ID.md) • [Changelog](./UV-K5%20DIGIPEATER/CHANGELOG.md) • [REV1G vs Standalone Comparison](./UV-K5%20DIGIPEATER/REV1G_VS_STANDALONE_EN.md)
+* **iGate Documentation:** [English Guide](./UV-K5%20IGATE/README.md) • [Panduan Bahasa Indonesia](./UV-K5%20IGATE/README_ID.md) • [Flashing Guide](./UV-K5%20IGATE/FLASHING.md) • [Changelog](./UV-K5%20IGATE/CHANGELOG.md)
+* **UV-K5 V3 Documentation:** [V3 Guide](./firmware/UV-K5-V3/README.md)
+* **Persistence Fix1 Details:** [PERSISTENCE_FIX1.md](./PERSISTENCE_FIX1.md)
+
+### GitHub Releases
+* **Digipeater Normal REV1G Fix1:** [`rev1g-fix1`](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g-fix1)
+* **Digipeater Standalone REV1H Fix1:** [`rev1h-standalone-fix1`](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone-fix1)
+* **iGate Normal REV1A Fix1:** [`igate-rev1a-fix1`](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a-fix1)
+* **iGate Standalone REV1B Fix1:** [`igate-rev1b-standalone-fix1`](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone-fix1)
+
+---
+
+## 📜 License & Attribution
+
+See the repository [LICENSE](./LICENSE) and [NOTICE](./UV-K5%20DIGIPEATER/NOTICE) files. Derived from the open-source Quansheng firmware ecosystem (DualTachyon, bg7nzl, phdlee, fagci, egzumer, OneOfEleven).
