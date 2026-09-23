@@ -27,13 +27,4 @@ Old truncated custom Object Name/Comment values cannot be recovered because thos
 
 The four builds compile with `-Werror`, packed firmware CRC-XMODEM was verified, encode/decode round-trip tests passed, and persistence behavior was subsequently tested successfully on real UV-K5 hardware.
 
-## SHA256
-
-```text
-51b89ff9bb9bdbf141b44f0ffc362a2e0cd9007d4ece376c5d863209a3befa5f  NUSA_UVK5_APRS_DIGI_REV1G.packed.bin
-d567603ced9ef646109e2049218ab65d71028ec7572b09f33d12ca27e87e47b2  NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
-675b32bbda58a71d333af5b0fa4e8ec7d8eb664f25e672712c701573a74855a7  NUSA_UVK5_IGATE_REV1A.packed.bin
-0080f7ea35f2e84489c341c3987aeabc9eea04cc00e1c8edbe9dd5c68b098460  NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
-```
-
-Source-level `settings.c` patches for each baseline are stored under `source-patches/PERSISTENCE_FIX1/`.
+Public GitHub releases contain only the firmware files needed by users.
