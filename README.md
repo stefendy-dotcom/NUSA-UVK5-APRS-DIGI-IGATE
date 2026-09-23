@@ -17,6 +17,8 @@
 
 APRS projects for the **Quansheng UV-K5 / UV-5K**, developed by **YF9UAG, Indonesia**.
 
+> ✅ **Persistence Fix1 — 23 September 2026:** power-cycle persistence fixes for DIGI Normal/Standalone and iGATE Normal/Standalone have been **tested successfully on real hardware**. See **[PERSISTENCE_FIX1.md](./PERSISTENCE_FIX1.md)**.
+
 > There are **two different projects** in this repository.  
 > The Digipeater can run on the UV-K5 by itself.  
 > The iGate uses a **UV-K5 + ESP32**.
@@ -25,8 +27,8 @@ APRS projects for the **Quansheng UV-K5 / UV-5K**, developed by **YF9UAG, Indone
 
 | Project | Hardware | Purpose | Current version | Documentation |
 |---|---|---|---|---|
-| **UV-K5 DIGIPEATER** | UV-K5 only | Standalone APRS RF digipeater | Normal REV1G / Standalone REV1H | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
-| **UV-K5 iGATE** | UV-K5 + ESP32 | RF ↔ APRS-IS gateway | Normal REV1A / Standalone REV1B | **[Open iGATE](./UV-K5%20IGATE/)** |
+| **UV-K5 DIGIPEATER** | UV-K5 only | Standalone APRS RF digipeater | Normal REV1G Fix1 / Standalone REV1H Fix1 | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
+| **UV-K5 iGATE** | UV-K5 + ESP32 | RF ↔ APRS-IS gateway | Normal REV1A Fix1 / Standalone REV1B Fix1 | **[Open iGATE](./UV-K5%20IGATE/)** |
 
 ---
 
@@ -41,7 +43,7 @@ Main features:
 - Normal and Standalone variants
 - Position beacon
 - TOCALL: `APZUAG`
-- REV1G RF engine has been field-tested; latest dedicated Standalone revision is **REV1H** (build/CRC verified, hardware field test pending)
+- REV1G RF engine has been field-tested; latest dedicated Standalone revision is **REV1H Fix1**; the EEPROM persistence fix has been field-tested successfully
 
 **Documentation and firmware:**
 
@@ -49,9 +51,9 @@ Main features:
 
 **Release:**
 
-### [Download Normal REV1G →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g)
+### [Download Normal REV1G →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g-fix1)
 
-### [Download Standalone REV1H →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone)
+### [Download Standalone REV1H →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone-fix1)
 
 ---
 
@@ -191,7 +193,7 @@ The identity prefix is mandatory and cannot be removed:
 - DIGI always transmits `NUSA DIGI` before the user comment
 - iGATE always transmits `NUSA IGATE` before the user comment
 
-These new Standalone revisions are **build verified and packed-CRC verified; hardware field testing is still pending**.
+These Standalone builds are **build verified, packed-CRC verified, and the Fix1 EEPROM persistence changes have been tested successfully on real UV-K5 hardware**.
 
 ## iGate traffic behavior
 
@@ -214,7 +216,7 @@ This path is implemented and is pending full on-air field validation.
 - REV1A Normal UV-K5 firmware: compile verified and packed CRC verified
 - Corrected UV-K5 ↔ ESP32 UART interface: **field-tested successfully**
 - REV1A Normal RF → ESP32 → APRS-IS: **field-tested successfully**
-- REV1B Standalone: compile verified; hardware field test pending
+- REV1B Standalone: compile/CRC verified; Fix1 EEPROM persistence tested successfully on real hardware
 - IS → RF APRS message path: implemented; on-air field validation pending
 - ESP32-C3 package: compile verified; hardware field test pending
 
@@ -227,18 +229,18 @@ This path is implemented and is pending full on-air field validation.
 
 **Release:**
 
-### [Download iGate Normal REV1A →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
+### [Download iGate Normal REV1A →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a-fix1)
 
-### [Download iGate Standalone REV1B →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone)
+### [Download iGate Standalone REV1B →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone-fix1)
 
 ---
 
 ## Releases
 
-- **Digipeater Normal REV1G:** [rev1g](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g)
-- **Digipeater Standalone REV1H:** [rev1h-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone)
-- **iGate Normal REV1A:** [igate-rev1a](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
-- **iGate Standalone REV1B:** [igate-rev1b-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone)
+- **Digipeater Normal REV1G Fix1:** [rev1g-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g-fix1)
+- **Digipeater Standalone REV1H Fix1:** [rev1h-standalone-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone-fix1)
+- **iGate Normal REV1A Fix1:** [igate-rev1a-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a-fix1)
+- **iGate Standalone REV1B Fix1:** [igate-rev1b-standalone-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone-fix1)
 
 ## License
 
