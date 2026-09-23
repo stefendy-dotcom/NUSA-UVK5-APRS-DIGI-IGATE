@@ -41,7 +41,7 @@ Validation:
 
 - compile verified with `-Werror`
 - packed CRC-XMODEM verified
-- hardware/on-air field test of REV1H pending
+- initial feature release; subsequent REV1H Fix1 maintenance verified on real hardware
 
 ## REV1G
 

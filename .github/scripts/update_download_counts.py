@@ -32,8 +32,15 @@ def github_get(url):
     if TOKEN:
         headers["Authorization"] = f"Bearer {TOKEN}"
     request = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(request, timeout=30) as response:
-        return json.load(response)
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as exc:
+        print(f"Warning: GitHub API error ({exc.code}) for {url}: {exc.reason}")
+        return []
+    except Exception as exc:
+        print(f"Warning: Failed to fetch {url}: {exc}")
+        return []
 
 
 def get_all_releases():
@@ -42,6 +49,8 @@ def get_all_releases():
     while True:
         url = f"https://api.github.com/repos/{REPO}/releases?per_page=100&page={page}"
         batch = github_get(url)
+        if not isinstance(batch, list) or len(batch) == 0:
+            break
         releases.extend(batch)
         if len(batch) < 100:
             break

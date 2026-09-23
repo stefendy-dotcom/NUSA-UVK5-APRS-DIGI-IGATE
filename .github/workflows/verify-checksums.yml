@@ -1,0 +1,31 @@
+name: Verify Firmware Checksums
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify UV-K5 DIGIPEATER Checksums
+        run: |
+          cd "UV-K5 DIGIPEATER"
+          sha256sum -c SHA256SUMS.txt
+          sha256sum -c SHA256SUMS_REV1H_STANDALONE.txt
+
+      - name: Verify UV-K5 IGATE Checksums
+        run: |
+          cd "UV-K5 IGATE"
+          sha256sum -c SHA256SUMS.txt
+
+      - name: Verify UV-K5 V3 Checksums
+        run: |
+          cd "firmware/UV-K5-V3"
+          sha256sum -c SHA256SUMS.txt

@@ -197,27 +197,33 @@ Fungsi HT biasa sengaja dibatasi.
 
 # Tabel Perbandingan
 
-| Fitur | REV1G | REV1G Standalone |
-|---|---|---|
-| APRS Digipeater | Ya | Ya |
-| Bell 202 1200/2200 | Ya | Ya, engine REV1G |
-| AX.25 / HDLC | Ya | Ya |
-| Hardware TIMER_BASE0 TX | Ya | Ya |
-| WIDE2 n-N | Ya | Selalu aktif |
-| Duplicate suppression | Ya | Ya |
-| Position beacon | Ya | Ya |
-| Manual beacon `*` | Ya | Ya |
-| APRS otomatis setelah boot | Tidak | Ya |
-| Perlu Long F2 | Ya | Tidak |
-| Bisa keluar APRS dengan EXIT | Ya | Tidak |
-| VFO A/B normal | Masih tersedia | Hanya VFO A untuk APRS |
-| Dual Watch | Mengikuti radio | OFF |
-| Cross Band | Mengikuti radio | OFF |
-| Menu `APRFq` | Tidak | Ya |
-| Frekuensi APRS tersimpan khusus | Tidak | Ya |
-| Voice HT normal | Masih lebih fleksibel | Sengaja dibatasi |
-| Tujuan utama | HT + APRS digi | Dedicated APRS digi |
-| Cocok untuk unattended site | Bisa | Dirancang khusus |
+| Fitur | REV1G Normal | REV1G Standalone (Legacy) | REV1H Standalone (Terbaru) |
+|---|---|---|---|
+| APRS Digipeater | Ya | Ya | Ya |
+| Bell 202 1200/2200 | Ya | Ya, engine REV1G | Ya, engine REV1G |
+| AX.25 / HDLC | Ya | Ya | Ya |
+| Hardware TIMER_BASE0 TX | Ya | Ya | Ya |
+| WIDE2 n-N | Ya | Selalu aktif | Selalu aktif |
+| Duplicate suppression | Ya | Ya | Ya |
+| Position beacon | Ya | Ya | Ya |
+| Tipe Beacon | Station saja | Station saja | Station atau APRS Object (`BType`) |
+| Object Name Editable | Tidak | Tidak | Ya, 9 karakter (`ObjNam`) |
+| Suffix Comment Editable | Tidak | Tidak | Ya, 16 karakter (`BComnt`) |
+| Prefix Comment TX | `NUSA DIGI` | `NUSA DIGI` | `NUSA DIGI` (wajib) |
+| Symbol APRS Editable | Tidak | Tidak | Ya, Tabel + Kode (`SymTbl`, `Symbol`) |
+| Persistence EEPROM | Fix1 2-page | 1 page (terpotong) | Fix1 5-page CRC16 NAP3 |
+| Manual beacon `*` | Ya | Ya | Ya |
+| APRS otomatis setelah boot | Tidak | Ya | Ya |
+| Perlu Long F2 | Ya | Tidak | Tidak |
+| Bisa keluar APRS dengan EXIT | Ya | Tidak | Tidak |
+| VFO A/B normal | Masih tersedia | Hanya VFO A untuk APRS | Hanya VFO A untuk APRS |
+| Dual Watch | Mengikuti radio | OFF | OFF |
+| Cross Band | Mengikuti radio | OFF | OFF |
+| Menu `APRFq` | Tidak | Ya | Ya |
+| Frekuensi APRS tersimpan khusus | Tidak | Ya | Ya |
+| Voice HT normal | Masih lebih fleksibel | Sengaja dibatasi | Sengaja dibatasi |
+| Tujuan utama | HT + APRS digi | Dedicated APRS digi | Appliance dedicated APRS digi |
+| Cocok untuk unattended site | Bisa | Dirancang khusus | Dirancang khusus |
 
 ---
 
@@ -225,17 +231,19 @@ Fungsi HT biasa sengaja dibatasi.
 
 Gunakan **REV1G Normal** jika:
 
-- UV-K5 masih ingin dipakai sebagai HT,
+- UV-K5 masih ingin dipakai sebagai HT fleksibel,
 - APRS hanya digunakan saat diperlukan,
 - ingin bisa masuk/keluar mode APRS secara manual.
 
-Gunakan **REV1G Standalone** jika:
+Gunakan **REV1H Standalone** jika:
 
-- radio akan dipasang permanen sebagai digipeater,
-- setelah listrik mati radio harus kembali menjadi digipeater otomatis,
-- hanya membutuhkan satu frekuensi APRS,
-- tidak membutuhkan fungsi voice HT normal,
-- ingin mengubah frekuensi APRS langsung dari keypad.
+- radio akan dipasang permanen sebagai digipeater tanpa pengawasan,
+- setelah power-cycle/listrik padam, radio harus otomatis kembali aktif sebagai digipeater,
+- ingin mengatur Object Name, Symbol kustom, dan suffix komentar,
+- hanya membutuhkan satu frekuensi APRS khusus,
+- ingin mengubah frekuensi APRS langsung dari keypad (`APRFq`).
+
+*(REV1G Standalone disimpan sebagai referensi lama; seluruh instalasi baru disarankan menggunakan REV1H Standalone Fix1).*
 
 ---
 
@@ -254,7 +262,9 @@ single VFO A
         +
 APRFq EEPROM menu
         +
-reduced dedicated menu
+Kontrol Object / Symbol / Comment (REV1H)
+        +
+Fix1 5-page CRC16 NAP3 EEPROM Persistence
 ```
 
 Karena itu perubahan standalone sengaja tidak mengubah bagian RF REV1G

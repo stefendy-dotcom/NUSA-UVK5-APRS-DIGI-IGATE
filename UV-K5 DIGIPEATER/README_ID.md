@@ -51,7 +51,7 @@ Contoh jika `BComnt = WAMENA`:
 NUSA DIGI WAMENA
 ```
 
-Status REV1H Standalone: **build verified + packed CRC verified**, tetapi **belum field-tested pada hardware/on-air**.
+Status REV1H Standalone Fix1: **build verified + packed CRC verified**, dan perbaikan persistence EEPROM telah **berhasil diuji pada hardware UV-K5 nyata**.
 
 SHA256:
 

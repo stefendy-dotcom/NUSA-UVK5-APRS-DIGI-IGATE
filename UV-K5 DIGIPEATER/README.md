@@ -121,7 +121,6 @@ REV1G SHA256       : 51b89ff9bb9bdbf141b44f0ffc362a2e0cd9007d4ece376c5d863209a3b
 Standalone SHA256  : d567603ced9ef646109e2049218ab65d71028ec7572b09f33d12ca27e87e47b2
 Beacon TOCALL      : APZUAG
 ```
-```
 
 ---
 

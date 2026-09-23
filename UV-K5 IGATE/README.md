@@ -87,6 +87,18 @@ See **[Persistence Fix1 details](../PERSISTENCE_FIX1.md)**.
 
 ![NUSA UV-K5 iGATE Connection Diagram](Connection%20Diagram.png)
 
+### Hardware, Power & RFI Protection Guidelines
+
+- **RF Interference (RFI) Mitigation:**
+  - When transmitting 4W–5W VHF/UHF RF, strong RF fields can induce current into unshielded UART wires and cause ESP32 crashes or Wi-Fi resets.
+  - Install a snap-on ferrite core (Type 43 or Type 31) on the Kenwood 2-pin interface cable as close to the radio as possible.
+  - Maintain physical separation (at least 20–30 cm) between the radio's antenna and the ESP32 module.
+- **Continuous 24/7 Station Power:**
+  - Do not power the UV-K5 continuously via its built-in USB-C port during 24/7 gateway duty, as the onboard USB charge controller can overheat.
+  - Use a dedicated 12V-to-8.4V battery eliminator in the battery compartment for permanent installations.
+- **ESP32 Power Supply:**
+  - Use a clean 5V 1A+ power source with adequate bulk capacitance to avoid brownout resets during simultaneous Wi-Fi transmission and UART traffic.
+
 ## Architecture
 
 ```text

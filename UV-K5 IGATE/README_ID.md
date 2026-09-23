@@ -87,6 +87,18 @@ Lihat **[detail Persistence Fix1](../PERSISTENCE_FIX1.md)**.
 
 ![Diagram Koneksi NUSA UV-K5 iGATE](Connection%20Diagram.png)
 
+### Panduan Hardware, Daya & Proteksi RFI
+
+- **Pencegahan Interferensi RF (RFI):**
+  - Saat memancar dengan daya 4W–5W VHF/UHF, medan RF kuat dapat menginduksi jalur kabel UART dan menyebabkan ESP32 hang atau Wi-Fi reset.
+  - Pasang ferit klip / snap-on ferrite core (Tipe 43 atau 31) pada kabel Kenwood 2-pin sedekat mungkin dengan bodi radio.
+  - Berikan jarak fisik (minimal 20–30 cm) antara antena radio dengan modul ESP32.
+- **Daya Operasional 24/7 (Base Station):**
+  - Hindari menyalakan UV-K5 secara terus-menerus melalui port USB-C internal untuk operasi iGate 24/7, karena sirkuit charger USB internal dapat mengalami panas berlebih.
+  - Gunakan battery eliminator 12V ke 8.4V pada kompartemen baterai untuk instalasi permanen.
+- **Catu Daya ESP32:**
+  - Gunakan power supply 5V 1A+ yang stabil untuk mencegah brownout reset saat transmisi Wi-Fi dan komunikasi UART berlangsung bersamaan.
+
 ## Arsitektur
 
 ```text

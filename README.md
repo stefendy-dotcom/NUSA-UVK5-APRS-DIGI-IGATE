@@ -28,6 +28,7 @@ APRS projects for the **Quansheng UV-K5 / UV-5K**, developed by **YF9UAG, Indone
 | Project | Hardware | Purpose | Current version | Documentation |
 |---|---|---|---|---|
 | **UV-K5 DIGIPEATER** | UV-K5 only | Standalone APRS RF digipeater | Normal REV1G Fix1 / Standalone REV1H Fix1 | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
+| **UV-K5 V3 DIGIPEATER** | UV-K5 V3 only | Standalone APRS RF digipeater (V3 hardware) | Normal REV1A | **[Open UV-K5-V3](./firmware/UV-K5-V3/)** |
 | **UV-K5 iGATE** | UV-K5 + ESP32 | RF ↔ APRS-IS gateway | Normal REV1A Fix1 / Standalone REV1B Fix1 | **[Open iGATE](./UV-K5%20IGATE/)** |
 
 ---
@@ -152,6 +153,15 @@ The 3.5 mm TIP carries radio supply voltage and must not be connected to an ESP3
 **Connection diagram:**
 
 ### [View Connection Diagram →](./UV-K5%20IGATE/Connection%20Diagram.png)
+
+### Hardware, Power & RFI Protection Tips
+
+1. **RFI Protection:** Transmitting 4W–5W VHF/UHF RF immediately adjacent to an unshielded ESP32 can induce RF into UART lines and reset the microcontroller.
+   - Install a snap-on ferrite core (Type 43 or 31) on the Kenwood interface cable.
+   - Keep the ESP32 board and wiring at least 20–30 cm away from the radio's antenna.
+2. **24/7 Station Power:**
+   - Avoid powering the UV-K5 continuously via its built-in USB-C port during 24/7 digi/iGate operation (the internal charge circuit can overheat).
+   - Use a dedicated 12V-to-8.4V battery eliminator in the battery compartment for permanent base station setups.
 
 ### 4. Configure the ESP32
 

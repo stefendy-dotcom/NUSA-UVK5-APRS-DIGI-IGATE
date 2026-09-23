@@ -198,27 +198,33 @@ Normal handheld-radio operation is intentionally restricted.
 
 # Comparison Table
 
-| Feature | REV1G | REV1G Standalone |
-|---|---|---|
-| APRS digipeater | Yes | Yes |
-| Bell 202 1200/2200 | Yes | Yes, REV1G engine |
-| AX.25 / HDLC | Yes | Yes |
-| Hardware TIMER_BASE0 TX | Yes | Yes |
-| WIDE2 n-N | Yes | Always enabled |
-| Duplicate suppression | Yes | Yes |
-| Position beacon | Yes | Yes |
-| Manual `*` beacon | Yes | Yes |
-| APRS starts after boot | No | Yes |
-| Long F2 required | Yes | No |
-| EXIT can leave APRS | Yes | No |
-| Normal VFO A/B flexibility | Available | VFO A only for APRS |
-| Dual Watch | Radio setting | OFF |
-| Cross Band | Radio setting | OFF |
-| `APRFq` menu | No | Yes |
-| Dedicated stored APRS frequency | No | Yes |
-| Normal voice-radio use | More flexible | Intentionally restricted |
-| Primary purpose | HT + APRS digi | Dedicated APRS digi |
-| Unattended-site use | Possible | Specifically designed |
+| Feature | REV1G Normal | REV1G Standalone (Legacy) | REV1H Standalone (Latest) |
+|---|---|---|---|
+| APRS digipeater | Yes | Yes | Yes |
+| Bell 202 1200/2200 | Yes | Yes, REV1G engine | Yes, REV1G engine |
+| AX.25 / HDLC | Yes | Yes | Yes |
+| Hardware TIMER_BASE0 TX | Yes | Yes | Yes |
+| WIDE2 n-N | Yes | Always enabled | Always enabled |
+| Duplicate suppression | Yes | Yes | Yes |
+| Position beacon | Yes | Yes | Yes |
+| Beacon Type | Station only | Station only | Station or APRS Object (`BType`) |
+| Editable Object Name | No | No | Yes, 9 characters (`ObjNam`) |
+| Editable Comment Suffix | No | No | Yes, 16 characters (`BComnt`) |
+| Transmitted Comment Prefix | `NUSA DIGI` | `NUSA DIGI` | `NUSA DIGI` (mandatory) |
+| Editable APRS Symbol | No | No | Yes, Table + Code (`SymTbl`, `Symbol`) |
+| EEPROM Persistence | Fix1 2-page | Single page (truncated) | Fix1 5-page CRC16 NAP3 |
+| Manual `*` beacon | Yes | Yes | Yes |
+| APRS starts after boot | No | Yes | Yes |
+| Long F2 required | Yes | No | No |
+| EXIT can leave APRS | Yes | No | No |
+| Normal VFO A/B flexibility | Available | VFO A only for APRS | VFO A only for APRS |
+| Dual Watch | Radio setting | OFF | OFF |
+| Cross Band | Radio setting | OFF | OFF |
+| `APRFq` menu | No | Yes | Yes |
+| Dedicated stored APRS frequency | No | Yes | Yes |
+| Normal voice-radio use | More flexible | Intentionally restricted | Intentionally restricted |
+| Primary purpose | HT + APRS digi | Dedicated APRS digi | Dedicated APRS digi appliance |
+| Unattended-site use | Possible | Specifically designed | Specifically designed |
 
 ---
 
@@ -230,13 +236,15 @@ Use **REV1G Normal** when:
 - APRS is only needed occasionally,
 - you want to enter and leave APRS manually.
 
-Use **REV1G Standalone** when:
+Use **REV1H Standalone** when:
 
-- the radio will be permanently installed as a digipeater,
+- the radio will be permanently installed as an unattended digipeater,
 - APRS must recover automatically after a power interruption,
+- you want custom APRS Object Name, custom symbols, and comment suffixes,
 - only one APRS frequency is required,
-- normal voice-radio operation is not needed,
-- you want direct keypad APRS frequency configuration.
+- direct keypad APRS frequency configuration (`APRFq`) is desired.
+
+*(REV1G Standalone is retained as legacy reference; all new standalone installations should use REV1H Standalone Fix1).*
 
 ---
 
@@ -255,7 +263,9 @@ single VFO A
         +
 APRFq EEPROM menu
         +
-reduced dedicated menu
+Object / Symbol / Comment Controls (REV1H)
+        +
+Fix1 5-page CRC16 NAP3 EEPROM Persistence
 ```
 
 The standalone changes are intentionally kept outside the field-proven
