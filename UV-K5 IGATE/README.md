@@ -1,6 +1,6 @@
 # NUSA UV-K5 iGATE
 
-[![iGate REV1A Downloads](https://img.shields.io/github/downloads/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/igate-rev1a/total?style=for-the-badge&logo=github&label=iGate%20REV1A%20Downloads)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a)
+[![iGate REV1A Downloads](https://img.shields.io/github/downloads/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/igate-rev1a/total?style=for-the-badge&logo=github&label=iGate%20REV1A%20Downloads)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a-fix1)
 
 **NUSA UV-K5 iGATE** turns a Quansheng UV-K5/UV-5K into the RF modem/radio side of a Wi-Fi APRS iGate. REV1A is the Normal baseline and REV1B is the dedicated Standalone revision. An ESP32 DevKit/WROOM-32 or ESP32-C3 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
 
@@ -21,7 +21,7 @@ Firmware:
 firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
 ```
 
-Release: **[igate-rev1b-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone)**
+Release: **[igate-rev1b-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone-fix1)**
 
 REV1B Standalone retains the existing UV-K5 ↔ ESP32 UART/iGate engine and adds dedicated APRS beacon controls:
 
@@ -55,13 +55,33 @@ LonEW
 
 The same ESP32 REV1A package/protocol is retained; no new ESP32 firmware is required for this UV-K5 Standalone revision.
 
-**Validation status:** build verified and packed-CRC verified; hardware/on-air testing of REV1B Standalone is pending.
+**Validation status:** build verified and packed-CRC verified; the Fix1 EEPROM persistence changes have been tested successfully on real UV-K5 hardware.
 
 SHA256:
 
 ```text
-d3b69b7c1cddd886248a6afceaca68987a30007ecca2aadba0ea0da7dfcb8c21
+0080f7ea35f2e84489c341c3987aeabc9eea04cc00e1c8edbe9dd5c68b098460
 ```
+
+## Persistence Fix1 — 23 September 2026
+
+The current REV1A Normal and REV1B Standalone UV-K5 binaries include the power-cycle persistence fix:
+
+- APRS EEPROM data is read as two 8-byte pages.
+- saved coordinates include an integrity check while remaining compatible with legacy coordinate data.
+- REV1B Standalone Object Name and Comment are now stored as five 8-byte EEPROM pages with CRC16 protection.
+- full 9-character Object Name and full 16-character Comment persist after radio OFF/ON.
+
+After upgrading REV1B Standalone, enter and save `ObjNam` and `BComnt` once. The old firmware did not write the missing bytes, so previously truncated custom text cannot be recovered.
+
+SHA256 of the Fix1 UV-K5 binaries:
+
+```text
+675b32bbda58a71d333af5b0fa4e8ec7d8eb664f25e672712c701573a74855a7  NUSA_UVK5_IGATE_REV1A.packed.bin
+0080f7ea35f2e84489c341c3987aeabc9eea04cc00e1c8edbe9dd5c68b098460  NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
+```
+
+See **[Persistence Fix1 details](../PERSISTENCE_FIX1.md)**.
 
 ## Connection Diagram
 
@@ -192,7 +212,7 @@ The ESP32 does **not** need a different firmware.
 - Corrected UART interface: **field-tested successfully**.
 - REV1A Normal RF -> ESP32 -> APRS-IS: **field-tested successfully**.
 - REV1B Standalone UV-K5 firmware: **compile verified and packed CRC verified**.
-- REV1B Standalone: **not yet field-tested on hardware**.
+- REV1B Standalone Fix1 EEPROM persistence: **field-tested successfully on hardware**.
 - IS -> RF APRS message path: implemented; pending on-air field validation.
 - ESP32-C3 package: **compile verified** with Arduino-ESP32 core 3.3.11 (`esp32:esp32:esp32c3`); hardware field test pending.
 
