@@ -19,7 +19,7 @@ Firmware:
 firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
 ```
 
-Release: [igate-rev1b-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone)
+Release: [igate-rev1b-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone-fix1)
 
 Menu Standalone REV1B:
 
@@ -55,13 +55,33 @@ Fitur baru:
 
 Protokol UART UV-K5 ↔ ESP32 tetap sama. **ESP32 tidak memerlukan firmware baru** untuk revisi UV-K5 Standalone ini.
 
-Status REV1B Standalone: **build verified + packed CRC verified**, hardware/on-air field test masih pending.
+Status REV1B Standalone Fix1: **build verified + packed CRC verified**, dan perbaikan persistence EEPROM sudah berhasil diuji pada hardware UV-K5 nyata.
 
 SHA256:
 
 ```text
-d3b69b7c1cddd886248a6afceaca68987a30007ecca2aadba0ea0da7dfcb8c21
+0080f7ea35f2e84489c341c3987aeabc9eea04cc00e1c8edbe9dd5c68b098460
 ```
+
+## Persistence Fix1 — 23 September 2026
+
+Firmware UV-K5 REV1A Normal dan REV1B Standalone saat ini sudah memakai perbaikan persistence saat radio dimatikan/dinyalakan:
+
+- data APRS EEPROM dibaca sebagai dua page 8-byte;
+- koordinat yang disimpan memiliki pemeriksaan integritas dan tetap kompatibel dengan data koordinat firmware lama;
+- REV1B Standalone sekarang menyimpan Object Name dan Comment sebagai lima page 8-byte dengan CRC16;
+- Object Name 9 karakter dan Comment 16 karakter tetap tersimpan setelah power-cycle.
+
+Setelah upgrade REV1B Standalone, **set dan simpan ulang `ObjNam` dan `BComnt` satu kali**. Nilai custom lama yang terpotong tidak dapat dipulihkan karena byte tersebut memang tidak pernah ditulis oleh firmware sebelumnya.
+
+SHA256 Fix1:
+
+```text
+675b32bbda58a71d333af5b0fa4e8ec7d8eb664f25e672712c701573a74855a7  NUSA_UVK5_IGATE_REV1A.packed.bin
+0080f7ea35f2e84489c341c3987aeabc9eea04cc00e1c8edbe9dd5c68b098460  NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
+```
+
+Lihat **[detail Persistence Fix1](../PERSISTENCE_FIX1.md)**.
 
 ## Diagram Koneksi
 
@@ -192,7 +212,7 @@ Standalone mempertahankan engine Bell-202, AX.25, UART framing, RF -> APRS-IS, s
 - Interface UART yang sudah dikoreksi: **sudah berhasil diuji pada hardware nyata**.
 - REV1A Normal RF -> ESP32 -> APRS-IS: **sudah berhasil diuji pada hardware nyata**.
 - REV1B Standalone UV-K5: **compile dan packed CRC sudah diverifikasi**.
-- REV1B Standalone: **belum diuji pada hardware nyata**.
+- REV1B Standalone Fix1: **persistence EEPROM sudah berhasil diuji pada hardware nyata**.
 - APRS-IS -> RF message: sudah diimplementasikan, masih menunggu pengujian on-air.
 - Paket ESP32-C3: **compile verified** menggunakan Arduino-ESP32 core 3.3.11 (`esp32:esp32:esp32c3`); pengujian hardware masih pending.
 
