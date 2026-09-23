@@ -1,0 +1,164 @@
+name: Publish UV-K5 Persistence Fix1
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/publish-persistence-fix1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download field-tested firmware and source patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://map.aprsid.com/static/nusa-uvk5-persist-fix1-release"
+
+          mkdir -p "UV-K5 DIGIPEATER/firmware" "UV-K5 IGATE/firmware"
+          mkdir -p "source-patches/PERSISTENCE_FIX1"
+
+          curl -fL "$BASE/NUSA_UVK5_APRS_DIGI_REV1G.packed.bin" \
+            -o "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1G.packed.bin"
+          curl -fL "$BASE/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin" \
+            -o "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin"
+          curl -fL "$BASE/NUSA_UVK5_IGATE_REV1A.packed.bin" \
+            -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin"
+          curl -fL "$BASE/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin" \
+            -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin"
+
+          curl -fL "$BASE/patches/DIGI_REV1G_SETTINGS_PERSIST_FIX1.patch" \
+            -o "source-patches/PERSISTENCE_FIX1/DIGI_REV1G_SETTINGS_PERSIST_FIX1.patch"
+          curl -fL "$BASE/patches/DIGI_REV1H_STANDALONE_SETTINGS_PERSIST_FIX1.patch" \
+            -o "source-patches/PERSISTENCE_FIX1/DIGI_REV1H_STANDALONE_SETTINGS_PERSIST_FIX1.patch"
+          curl -fL "$BASE/patches/IGATE_REV1A_SETTINGS_PERSIST_FIX1.patch" \
+            -o "source-patches/PERSISTENCE_FIX1/IGATE_REV1A_SETTINGS_PERSIST_FIX1.patch"
+          curl -fL "$BASE/patches/IGATE_REV1B_STANDALONE_SETTINGS_PERSIST_FIX1.patch" \
+            -o "source-patches/PERSISTENCE_FIX1/IGATE_REV1B_STANDALONE_SETTINGS_PERSIST_FIX1.patch"
+
+      - name: Verify firmware SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "51b89ff9bb9bdbf141b44f0ffc362a2e0cd9007d4ece376c5d863209a3befa5f  UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1G.packed.bin" | sha256sum -c -
+          echo "d567603ced9ef646109e2049218ab65d71028ec7572b09f33d12ca27e87e47b2  UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin" | sha256sum -c -
+          echo "675b32bbda58a71d333af5b0fa4e8ec7d8eb664f25e672712c701573a74855a7  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin" | sha256sum -c -
+          echo "0080f7ea35f2e84489c341c3987aeabc9eea04cc00e1c8edbe9dd5c68b098460  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin" | sha256sum -c -
+
+      - name: Write release checksums and patch notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > SHA256SUMS_PERSIST_FIX1.txt <<'EOF'
+          51b89ff9bb9bdbf141b44f0ffc362a2e0cd9007d4ece376c5d863209a3befa5f  NUSA_UVK5_APRS_DIGI_REV1G.packed.bin
+          d567603ced9ef646109e2049218ab65d71028ec7572b09f33d12ca27e87e47b2  NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
+          675b32bbda58a71d333af5b0fa4e8ec7d8eb664f25e672712c701573a74855a7  NUSA_UVK5_IGATE_REV1A.packed.bin
+          0080f7ea35f2e84489c341c3987aeabc9eea04cc00e1c8edbe9dd5c68b098460  NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin
+          EOF
+
+          cp SHA256SUMS_PERSIST_FIX1.txt "UV-K5 DIGIPEATER/SHA256SUMS_PERSIST_FIX1.txt"
+          cp SHA256SUMS_PERSIST_FIX1.txt "UV-K5 IGATE/SHA256SUMS_PERSIST_FIX1.txt"
+
+          cat > "source-patches/PERSISTENCE_FIX1/README.md" <<'EOF'
+          # Persistence Fix1 source patches
+
+          These patches document the settings.c changes used to build the field-tested Persistence Fix1 binaries.
+
+          They cover:
+          - 8-byte EEPROM page-aligned APRS reads
+          - coordinate integrity checking with legacy-read compatibility
+          - Standalone 5 x 8-byte metadata writes
+          - CRC16-protected Standalone metadata
+
+          See ../../PERSISTENCE_FIX1.md for release details and SHA256 values.
+          EOF
+
+      - name: Commit verified firmware, checksums and patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1G.packed.bin"
+          git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin"
+          git add "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin"
+          git add "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin"
+          git add "UV-K5 DIGIPEATER/SHA256SUMS_PERSIST_FIX1.txt"
+          git add "UV-K5 IGATE/SHA256SUMS_PERSIST_FIX1.txt"
+          git add "SHA256SUMS_PERSIST_FIX1.txt"
+          git add "source-patches/PERSISTENCE_FIX1"
+
+          if ! git diff --cached --quiet; then
+            git commit -m "Release field-tested UV-K5 Persistence Fix1"
+            git push
+          fi
+
+      - name: Create DIGI REV1G Fix1 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release delete rev1g-fix1 --yes --cleanup-tag 2>/dev/null || true
+          gh release create rev1g-fix1 \
+            "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1G.packed.bin" \
+            "UV-K5 DIGIPEATER/SHA256SUMS_PERSIST_FIX1.txt" \
+            "source-patches/PERSISTENCE_FIX1/DIGI_REV1G_SETTINGS_PERSIST_FIX1.patch" \
+            --target main \
+            --title "NUSA UV-K5 APRS DIGI REV1G — Persistence Fix1" \
+            --notes "Field-tested maintenance release. Fixes coordinate persistence across power cycles by aligning APRS EEPROM reads to 8-byte pages and adding an integrity check to newly saved coordinates while retaining legacy coordinate compatibility. RF/APRS behavior remains the REV1G baseline."
+
+      - name: Create DIGI REV1H Standalone Fix1 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release delete rev1h-standalone-fix1 --yes --cleanup-tag 2>/dev/null || true
+          gh release create rev1h-standalone-fix1 \
+            "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin" \
+            "UV-K5 DIGIPEATER/SHA256SUMS_PERSIST_FIX1.txt" \
+            "source-patches/PERSISTENCE_FIX1/DIGI_REV1H_STANDALONE_SETTINGS_PERSIST_FIX1.patch" \
+            --target main \
+            --title "NUSA UV-K5 APRS DIGI REV1H Standalone — Persistence Fix1" \
+            --notes "Field-tested maintenance release. Fixes Standalone Object Name/Comment persistence: metadata is now written as five 8-byte EEPROM pages with CRC16 protection. Full 9-character Object Name and 16-character Comment survive power cycles. Also includes protected coordinate persistence. After upgrade, enter and save Object Name and Comment once because the old firmware never stored the missing bytes."
+
+      - name: Create iGATE REV1A Fix1 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release delete igate-rev1a-fix1 --yes --cleanup-tag 2>/dev/null || true
+          gh release create igate-rev1a-fix1 \
+            "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1A.packed.bin" \
+            "UV-K5 IGATE/SHA256SUMS_PERSIST_FIX1.txt" \
+            "source-patches/PERSISTENCE_FIX1/IGATE_REV1A_SETTINGS_PERSIST_FIX1.patch" \
+            --target main \
+            --title "NUSA UV-K5 iGATE REV1A — Persistence Fix1" \
+            --notes "Field-tested maintenance release for the UV-K5 side of iGATE REV1A. Fixes coordinate persistence across power cycles using 8-byte page-aligned EEPROM reads and integrity checking. Existing UART/iGATE behavior is retained; ESP32 firmware is unchanged."
+
+      - name: Create iGATE REV1B Standalone Fix1 release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release delete igate-rev1b-standalone-fix1 --yes --cleanup-tag 2>/dev/null || true
+          gh release create igate-rev1b-standalone-fix1 \
+            "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1B_STANDALONE.packed.bin" \
+            "UV-K5 IGATE/SHA256SUMS_PERSIST_FIX1.txt" \
+            "source-patches/PERSISTENCE_FIX1/IGATE_REV1B_STANDALONE_SETTINGS_PERSIST_FIX1.patch" \
+            --target main \
+            --title "NUSA UV-K5 iGATE REV1B Standalone — Persistence Fix1" \
+            --notes "Field-tested maintenance release. Fixes Standalone Object Name/Comment persistence using five 8-byte EEPROM pages plus CRC16 and includes protected coordinate persistence. Existing UV-K5 to ESP32 UART/iGATE engine is retained. After upgrade, enter and save Object Name and Comment once because the old firmware never stored the missing bytes."
