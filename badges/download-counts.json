@@ -5,9 +5,9 @@
     "digi_normal": 7,
     "digi_standalone": 15,
     "igate_normal": 3,
-    "igate_standalone": 6,
+    "igate_standalone": 7,
     "esp32_igate": 5,
     "esp32c3_igate": 4,
-    "total": 40
+    "total": 41
   }
 }
