@@ -17,6 +17,17 @@
 
 APRS projects for the **Quansheng UV-K5 / UV-5K**, developed by **YF9UAG, Indonesia**.
 
+## ✅ Latest Field-Tested Release: REV1U — 26 September 2026
+
+REV1U is the current UV-K5 firmware family for both **DIGI** and **iGATE**, Normal and Standalone. It keeps Persistence Fix1 and adds the field-tested multi-device RX improvements from REV1T plus corrected LED behavior and NUSA boot branding.
+
+- RX compatibility improved with aggregate BK4819 FIFO capture before AX.25 decode.
+- Field tests successfully decoded multiple APRS devices, including **Yaesu FT-2DR** and **UV-5RH**.
+- LED: **standby OFF / RX green / TX red**.
+- Boot/version identity is compiled as **NUSA**.
+- iGATE UART protocol and ESP32 side remain unchanged; no new ESP32 firmware is required for this UV-K5 update.
+- Release: **[REV1U](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)**
+
 > ✅ **Persistence Fix1 — 23 September 2026:** power-cycle persistence fixes for DIGI Normal/Standalone and iGATE Normal/Standalone have been **tested successfully on real hardware**. See **[PERSISTENCE_FIX1.md](./PERSISTENCE_FIX1.md)**.
 
 > There are **two different projects** in this repository.  
@@ -27,8 +38,8 @@ APRS projects for the **Quansheng UV-K5 / UV-5K**, developed by **YF9UAG, Indone
 
 | Project | Hardware | Purpose | Current version | Documentation |
 |---|---|---|---|---|
-| **UV-K5 DIGIPEATER** | UV-K5 only | Standalone APRS RF digipeater | Normal REV1G Fix1 / Standalone REV1H Fix1 | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
-| **UV-K5 iGATE** | UV-K5 + ESP32 | RF ↔ APRS-IS gateway | Normal REV1A Fix1 / Standalone REV1B Fix1 | **[Open iGATE](./UV-K5%20IGATE/)** |
+| **UV-K5 DIGIPEATER** | UV-K5 only | Standalone APRS RF digipeater | **Normal REV1U / Standalone REV1U** | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
+| **UV-K5 iGATE** | UV-K5 + ESP32 | RF ↔ APRS-IS gateway | **Normal REV1U / Standalone REV1U** | **[Open iGATE](./UV-K5%20IGATE/)** |
 
 ---
 
@@ -43,7 +54,7 @@ Main features:
 - Normal and Standalone variants
 - Position beacon
 - TOCALL: `APZUAG`
-- REV1G RF engine has been field-tested; latest dedicated Standalone revision is **REV1H Fix1**; the EEPROM persistence fix has been field-tested successfully
+- **REV1U** is the current field-tested DIGI engine for both Normal and Standalone; Persistence Fix1 is retained
 
 **Documentation and firmware:**
 
@@ -51,15 +62,13 @@ Main features:
 
 **Release:**
 
-### [Download Normal REV1G →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g-fix1)
-
-### [Download Standalone REV1H →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone-fix1)
+### [Download DIGI Normal + Standalone REV1U →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)
 
 ---
 
 # UV-K5 + ESP32 iGATE
 
-**NUSA UV-K5 iGATE REV1A** uses the UV-K5 as the Bell 202 / AX.25 RF modem and an ESP32 as the Wi-Fi/APRS-IS gateway.
+**NUSA UV-K5 iGATE REV1U** uses the UV-K5 as the Bell 202 / AX.25 RF modem and an ESP32 as the Wi-Fi/APRS-IS gateway.
 
 ```text
 APRS RF
@@ -107,8 +116,8 @@ Local APRS RF station
 
 Choose the required UV-K5 variant:
 
-- **REV1A Normal** — enter APRS/iGate mode manually, normally with **Long F2**; field-tested RF → APRS-IS baseline
-- **REV1B Standalone** — dedicated iGate mode starts automatically after power-on and adds editable APRS Object, comment and symbol settings
+- **REV1U Normal** — enter APRS/iGate mode manually, normally with **Long F2**
+- **REV1U Standalone** — dedicated iGate mode starts automatically after power-on and retains editable APRS Object, comment and symbol settings
 
 Firmware and detailed instructions are in:
 
@@ -169,18 +178,18 @@ After flashing:
 
 ### 5. Start the iGate
 
-For **REV1A Normal**:
+For **REV1U Normal**:
 
 1. Select the VFO and APRS frequency on the UV-K5.
 2. Long-press **F2** to enter APRS/iGate mode.
 3. The selected VFO is used and Dual Watch is disabled while APRS mode is active.
 4. The ESP32 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
 
-For **REV1B Standalone**, the dedicated iGate runtime starts automatically after power-on.
+For **REV1U Standalone**, the dedicated iGate runtime starts automatically after power-on.
 
 ### Latest Standalone-only APRS beacon controls
 
-Both **DIGI REV1H Standalone** and **iGATE REV1B Standalone** add menu controls for:
+Both **DIGI REV1U Standalone** and **iGATE REV1U Standalone** provide menu controls for:
 
 - `BType` — Station / Object beacon
 - `ObjNam` — editable APRS Object Name, maximum 9 characters
@@ -213,10 +222,10 @@ This path is implemented and is pending full on-air field validation.
 
 ## iGate validation status
 
-- REV1A Normal UV-K5 firmware: compile verified and packed CRC verified
+- REV1U Normal UV-K5 firmware: compile verified, packed CRC verified, and based on the field-tested REV1T RX engine
 - Corrected UV-K5 ↔ ESP32 UART interface: **field-tested successfully**
 - REV1A Normal RF → ESP32 → APRS-IS: **field-tested successfully**
-- REV1B Standalone: compile/CRC verified; Fix1 EEPROM persistence tested successfully on real hardware
+- REV1U Standalone: compile/CRC verified; Fix1 EEPROM persistence and REV1U LED behavior tested successfully on real hardware
 - IS → RF APRS message path: implemented; on-air field validation pending
 - ESP32-C3 package: compile verified; hardware field test pending
 
@@ -229,14 +238,13 @@ This path is implemented and is pending full on-air field validation.
 
 **Release:**
 
-### [Download iGate Normal REV1A →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a-fix1)
-
-### [Download iGate Standalone REV1B →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1b-standalone-fix1)
+### [Download iGATE Normal + Standalone REV1U →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)
 
 ---
 
 ## Releases
 
+- **Latest — REV1U family (DIGI + iGATE, Normal + Standalone):** [rev1u](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)
 - **Digipeater Normal REV1G Fix1:** [rev1g-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g-fix1)
 - **Digipeater Standalone REV1H Fix1:** [rev1h-standalone-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone-fix1)
 - **iGate Normal REV1A Fix1:** [igate-rev1a-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a-fix1)
