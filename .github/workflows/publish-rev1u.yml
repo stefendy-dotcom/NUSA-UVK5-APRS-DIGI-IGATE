@@ -1,0 +1,141 @@
+name: Publish NUSA UV-K5 REV1U
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/publish-rev1u.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download verified REV1U firmware
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://map.aprsid.com/static/nusa-uvk5-v1-rev1u-nusa-build"
+
+          mkdir -p "UV-K5 DIGIPEATER/firmware" "UV-K5 IGATE/firmware"
+
+          curl -fL "$BASE/NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin" \
+            -o "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin" \
+            -o "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_IGATE_REV1U_NORMAL.packed.bin" \
+            -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1U_NORMAL.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_IGATE_REV1U_STANDALONE.packed.bin" \
+            -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1U_STANDALONE.packed.bin"
+
+      - name: Verify SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "6a147bb699da71d44967ccaacf264c7810a8e9ae3e588fec2e23ebf4c0bb7414  UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin" | sha256sum -c -
+          echo "9f9b1f9e74f74ffc0a09e185c07235a19a0933f2af135c3cbdae62bfbd310e58  UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin" | sha256sum -c -
+          echo "ac97d4401f2640518ba876d4578711e11a6bc3da8cf2082ebc628f09d9e86ac5  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1U_NORMAL.packed.bin" | sha256sum -c -
+          echo "1cae43903069afd705b3ecd7f8ca171e0cc1dea746d06a696653049dde31cf9f  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1U_STANDALONE.packed.bin" | sha256sum -c -
+
+      - name: Commit REV1U firmware files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin"
+          git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin"
+          git add "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1U_NORMAL.packed.bin"
+          git add "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1U_STANDALONE.packed.bin"
+
+          if ! git diff --cached --quiet; then
+            git commit -m "release: add field-tested REV1U firmware family"
+            git push
+          fi
+
+      - name: Create REV1U GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          TAG="rev1u"
+          TITLE="NUSA UV-K5 APRS REV1U — Field-Tested Multi-Device RX"
+
+          git fetch origin main
+          HEAD_SHA="$(git rev-parse origin/main)"
+
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release delete "$TAG" --repo "$REPO" --cleanup-tag --yes
+          fi
+
+          git tag -f "$TAG" "$HEAD_SHA"
+          git push origin "refs/tags/$TAG" --force
+
+          cat > /tmp/rev1u-notes.md <<'EOF'
+          # NUSA UV-K5 APRS REV1U
+
+          Field-tested firmware update for the Quansheng UV-K5 / UV-5K APRS projects.
+
+          ## Included firmware
+
+          - DIGI Normal REV1U
+          - DIGI Standalone REV1U
+          - iGATE Normal REV1U
+          - iGATE Standalone REV1U
+
+          ## Main changes
+
+          - Improved APRS RX compatibility with multiple transmitting devices.
+          - BK4819 RX fragments from one RF packet are aggregated before AX.25 decode.
+          - RX capture buffer increased to 480 bytes.
+          - Packet decode is finalized after about 120 ms of FSK inactivity.
+          - Field testing successfully decoded multiple APRS devices, including Yaesu FT-2DR and UV-5RH.
+          - First Bell-202 TX symbol is loaded before TX unmute.
+          - LED behavior corrected:
+            - Standby: OFF
+            - RX: GREEN
+            - TX: RED
+          - Boot/version branding is compiled as NUSA.
+          - Persistence Fix1 remains included.
+          - iGATE UART protocol and ESP32 side are unchanged; no new ESP32 firmware is required.
+
+          ## Bahasa Indonesia
+
+          REV1U adalah update firmware UV-K5 yang sudah diuji di lapangan.
+
+          - RX APRS lebih kompatibel terhadap beberapa device.
+          - Potongan FIFO BK4819 dari satu packet digabung sebelum AX.25 decode.
+          - Buffer RX menjadi 480 byte.
+          - Decode dilakukan setelah sekitar 120 ms tidak ada aktivitas FSK.
+          - Pengujian berhasil decode beberapa device APRS, termasuk Yaesu FT-2DR dan UV-5RH.
+          - LED standby mati, RX hijau, TX merah.
+          - Identitas firmware saat boot sudah NUSA.
+          - Persistence Fix1 tetap dipertahankan.
+          - iGATE tetap memakai protokol UART/ESP32 yang sama.
+
+          Flash only the appropriate *.packed.bin firmware for your variant.
+          EOF
+
+          gh release create "$TAG" \
+            "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin" \
+            "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin" \
+            "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1U_NORMAL.packed.bin" \
+            "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1U_STANDALONE.packed.bin" \
+            --repo "$REPO" \
+            --title "$TITLE" \
+            --notes-file /tmp/rev1u-notes.md
