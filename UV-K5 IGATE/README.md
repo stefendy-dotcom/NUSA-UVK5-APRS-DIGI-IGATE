@@ -1,13 +1,33 @@
 # NUSA UV-K5 iGATE
 
+## Latest UV-K5 firmware: REV1U
+
+REV1U is the current UV-K5 iGATE firmware for both Normal and Standalone. It keeps the existing UART protocol and ESP32 firmware while adopting the field-tested REV1T multi-device RX engine plus the REV1U LED/branding fix.
+
+- Standby LED OFF / RX green / TX red.
+- Multiple BK4819 RX fragments are aggregated before AX.25 decode.
+- Persistence Fix1 is retained.
+- Boot/version identity is compiled as NUSA.
+- **No new ESP32 firmware is required.**
+
+Firmware:
+
+```text
+firmware/NUSA_UVK5_IGATE_REV1U_NORMAL.packed.bin
+firmware/NUSA_UVK5_IGATE_REV1U_STANDALONE.packed.bin
+```
+
+Release: **[rev1u](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)**
+
+
 [![iGate REV1A Downloads](https://img.shields.io/github/downloads/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/igate-rev1a/total?style=for-the-badge&logo=github&label=iGate%20REV1A%20Downloads)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/igate-rev1a-fix1)
 
-**NUSA UV-K5 iGATE** turns a Quansheng UV-K5/UV-5K into the RF modem/radio side of a Wi-Fi APRS iGate. REV1A is the Normal baseline and REV1B is the dedicated Standalone revision. An ESP32 DevKit/WROOM-32 or ESP32-C3 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
+**NUSA UV-K5 iGATE** turns a Quansheng UV-K5/UV-5K into the RF modem/radio side of a Wi-Fi APRS iGate. REV1U is the current Normal and Standalone UV-K5 firmware family. An ESP32 DevKit/WROOM-32 or ESP32-C3 handles Wi-Fi, APRS-IS connectivity, filtering, and the web dashboard.
 
 Two UV-K5 firmware variants are provided:
 
-1. **REV1A Normal** — APRS/iGate is entered manually, normally with Long F2.
-2. **REV1B Standalone** — dedicated iGate mode starts automatically after power-on.
+1. **REV1U Normal** — APRS/iGate is entered manually, normally with Long F2.
+2. **REV1U Standalone** — dedicated iGate mode starts automatically after power-on.
 
 Both UV-K5 variants use the **same UART protocol**. Separate compiled ESP32 packages are provided for classic ESP32/WROOM-32 and ESP32-C3.
 
