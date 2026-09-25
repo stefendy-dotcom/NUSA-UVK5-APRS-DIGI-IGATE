@@ -1,5 +1,28 @@
 # NUSA UV-K5 APRS Digipeater — Bahasa Indonesia
 
+## Terbaru: REV1U Normal / REV1U Standalone
+
+REV1U adalah firmware DIGI terbaru yang sudah diuji di lapangan. Engine Persistence Fix1 tetap dipertahankan.
+
+Perubahan utama REV1U:
+
+- beberapa potongan FIFO BK4819 dari satu packet digabung sebelum decode;
+- buffer RX 480 byte dan decode setelah sekitar 120 ms tidak ada aktivitas FSK;
+- kompatibilitas RX lebih baik terhadap beberapa device APRS; pengujian termasuk Yaesu FT-2DR dan UV-5RH;
+- symbol Bell-202 pertama sudah dimuat sebelum TX unmute;
+- LED: standby mati, RX hijau, TX merah;
+- identitas boot dikompilasi sebagai NUSA.
+
+Firmware:
+
+```text
+firmware/NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin
+firmware/NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin
+```
+
+Release: [rev1u](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)
+
+
 > ✅ **Persistence Fix1 — 23 September 2026:** masalah perubahan koordinat setelah power-cycle dan penyimpanan Object Name/Comment Standalone sudah diperbaiki dan **berhasil diuji pada hardware UV-K5 nyata**. Setelah upgrade Standalone, set dan simpan ulang `ObjNam` serta `BComnt` satu kali.
 
 ## Terbaru khusus Standalone: REV1H
@@ -63,10 +86,10 @@ d567603ced9ef646109e2049218ab65d71028ec7572b09f33d12ca27e87e47b2
 
 Firmware APRS digipeater untuk **Quansheng UV-K5**.
 
-Rilis awal GitHub berisi dua firmware:
+Firmware terbaru tersedia dalam dua varian:
 
-1. **REV1G Normal**
-2. **REV1H Standalone Digipeater**
+1. **REV1U Normal**
+2. **REV1U Standalone Digipeater**
 
 ## REV1G Normal
 
