@@ -1,16 +1,32 @@
 # NUSA UV-K5 APRS Digipeater
 
-# Latest: REV1G Fix1 / REV1H Standalone Fix1
+# Latest: REV1U Normal / REV1U Standalone
 
-> **REV1G Normal remains the field-tested RF baseline. REV1H is a Standalone-only feature revision.**
+> **REV1U is the current field-tested DIGI family for both Normal and Standalone.**
 
 Firmware:
 
 ```text
-firmware/NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin
+firmware/NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin
+firmware/NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin
 ```
 
-Release: **[rev1h-standalone](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1h-standalone-fix1)**
+Release: **[rev1u](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)**
+
+## REV1U — Field-tested compatibility update
+
+REV1U keeps the proven Bell 202 / AX.25 engine and Persistence Fix1, with these field-tested changes:
+
+- aggregate multiple BK4819 RX fragments before decoding instead of treating every RX_FINISHED as a separate packet;
+- 480-byte RX capture buffer and end-of-packet decode after about 120 ms of FSK inactivity;
+- improved compatibility with multiple APRS transmitters; field tests include Yaesu FT-2DR and UV-5RH;
+- first TX Bell-202 symbol is preloaded before unmute;
+- LED behavior: standby OFF, RX green, TX red;
+- compile-time boot identity is NUSA.
+
+REV1U Normal SHA256: `6a147bb699da71d44967ccaacf264c7810a8e9ae3e588fec2e23ebf4c0bb7414`
+
+REV1U Standalone SHA256: `9f9b1f9e74f74ffc0a09e185c07235a19a0933f2af135c3cbdae62bfbd310e58`
 
 REV1H Standalone adds these dedicated APRS controls while retaining the REV1G Bell-202 / AX.25 digipeater engine:
 
@@ -78,8 +94,8 @@ Custom APRS digipeater firmware for the **Quansheng UV-K5**, developed and field
 
 Current firmware choices are:
 
-1. **REV1G — Normal APRS Digipeater**
-2. **REV1H Standalone — Dedicated Autostart APRS Digipeater**
+1. **REV1U — Normal APRS Digipeater**
+2. **REV1U Standalone — Dedicated Autostart APRS Digipeater**
 
 > **Important:** Flash only the `.packed.bin` file intended for the UV-K5 firmware updater. Keep a known-good firmware available for recovery before experimenting with custom firmware.
 
