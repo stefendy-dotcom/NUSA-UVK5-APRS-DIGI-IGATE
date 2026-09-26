@@ -1,5 +1,19 @@
 # Changelog
 
+## REV1U — 2026-09-25
+
+Field-tested firmware update for REV1U Normal and REV1U Standalone (release `rev1u`).
+
+- Improved APRS RX compatibility with multiple transmitting devices.
+- BK4819 RX fragments from one RF packet are aggregated before AX.25 decode.
+- RX capture buffer increased to 480 bytes.
+- Packet decode is finalized after about 120 ms of FSK inactivity.
+- Field testing successfully decoded multiple APRS devices, including Yaesu FT-2DR and UV-5RH.
+- First Bell-202 TX symbol is loaded before TX unmute.
+- LED behavior corrected: standby OFF, RX green, TX red.
+- Boot/version branding is compiled as NUSA.
+- Persistence Fix1 remains included.
+
 ## Persistence Fix1 — 2026-09-23
 
 Field-tested EEPROM persistence maintenance release for REV1G Normal and REV1H Standalone.
