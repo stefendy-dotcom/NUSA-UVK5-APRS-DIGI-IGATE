@@ -2,12 +2,12 @@
   "repository": "stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE",
   "description": "Cumulative GitHub Release Asset download counts grouped by firmware family.",
   "counts": {
-    "digi_normal": 10,
-    "digi_standalone": 18,
-    "igate_normal": 3,
-    "igate_standalone": 7,
+    "digi_normal": 11,
+    "digi_standalone": 19,
+    "igate_normal": 4,
+    "igate_standalone": 8,
     "esp32_igate": 5,
     "esp32c3_igate": 4,
-    "total": 47
+    "total": 51
   }
 }
