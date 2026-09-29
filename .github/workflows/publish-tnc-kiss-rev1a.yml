@@ -1,0 +1,250 @@
+name: Publish NUSA UV-K5 TNC KISS REV1A
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/publish-tnc-kiss-rev1a.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download verified TNC KISS firmware
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://map.aprsid.com/static/nusa-uvk5-v1-tnc-kiss-rev1a"
+
+          mkdir -p "UV-K5 TNC KISS/firmware"
+
+          curl -fL "$BASE/NUSA_UVK5_TNC_KISS_REV1A_NORMAL.packed.bin" \
+            -o "UV-K5 TNC KISS/firmware/NUSA_UVK5_TNC_KISS_REV1A_NORMAL.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_TNC_KISS_REV1A_STANDALONE.packed.bin" \
+            -o "UV-K5 TNC KISS/firmware/NUSA_UVK5_TNC_KISS_REV1A_STANDALONE.packed.bin"
+
+      - name: Verify SHA256 before publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "b68bf4649d86d4cd06ddf363944a7834ac830be120f2e86c2def49db4829ad0e  UV-K5 TNC KISS/firmware/NUSA_UVK5_TNC_KISS_REV1A_NORMAL.packed.bin" | sha256sum -c -
+          echo "cba26650328280b06e8c1efe4ac256a9b55754290b5e86c23ecdcc57d02520a7  UV-K5 TNC KISS/firmware/NUSA_UVK5_TNC_KISS_REV1A_STANDALONE.packed.bin" | sha256sum -c -
+
+      - name: Commit firmware into project folder
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "UV-K5 TNC KISS/firmware/NUSA_UVK5_TNC_KISS_REV1A_NORMAL.packed.bin"
+          git add "UV-K5 TNC KISS/firmware/NUSA_UVK5_TNC_KISS_REV1A_STANDALONE.packed.bin"
+
+          if ! git diff --cached --quiet; then
+            git commit -m "release: add experimental TNC KISS REV1A firmware"
+            git push
+          fi
+
+      - name: Create experimental GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          TAG="tnc-kiss-rev1a"
+          TITLE="NUSA UV-K5 TNC KISS REV1A — Experimental / Community Test"
+
+          git fetch origin main
+          HEAD_SHA="$(git rev-parse origin/main)"
+
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release delete "$TAG" --repo "$REPO" --cleanup-tag --yes
+          fi
+
+          git tag -f "$TAG" "$HEAD_SHA"
+          git push origin "refs/tags/$TAG" --force
+
+          cat > /tmp/tnc-kiss-rev1a-notes.md <<'EOF'
+          # NUSA UV-K5 V1 TNC KISS REV1A
+
+          > ⚠️ **EXPERIMENTAL / UNTESTED RELEASE**
+          >
+          > This firmware has been compile/link/pack verified but has **not yet been tested end-to-end on real UV-K5 V1 hardware with external KISS host software**.
+          > It is being released publicly so users can help test it. Please report both PASS and FAIL results through GitHub Issues.
+
+          ## What this firmware does
+
+          NUSA UV-K5 TNC KISS turns a **Quansheng UV-K5 V1** into a Bell 202 / AX.25 1200-baud radio TNC controlled by software over **standard serial KISS**.
+
+          It is based on the modem RX/TX engine used by the NUSA REV1AB firmware family.
+
+          This is **not** the proprietary NUSA iGATE UART protocol. KISS mode uses standard KISS framing only.
+
+          ## Included firmware
+
+          ### Normal
+
+          `NUSA_UVK5_TNC_KISS_REV1A_NORMAL.packed.bin`
+
+          - normal radio operation remains available outside TNC mode;
+          - **Long F2** enters KISS TNC mode;
+          - **EXIT** leaves KISS TNC mode;
+          - UART is owned by KISS while TNC mode is active.
+
+          ### Standalone
+
+          `NUSA_UVK5_TNC_KISS_REV1A_STANDALONE.packed.bin`
+
+          - power-on automatically enters KISS TNC mode;
+          - intended for a UV-K5 dedicated as a packet/APRS modem;
+          - host software owns packet transmission.
+
+          ## UART
+
+          ```text
+          38400 baud
+          8N1
+          no hardware flow control
+          KISS port 0
+          ```
+
+          The DP32 UART calibration retains:
+
+          ```c
+          UART1->BAUD = Frequency / 39053U;
+          ```
+
+          ## Standard KISS framing
+
+          ```text
+          FEND  = C0
+          FESC  = DB
+          TFEND = DC
+          TFESC = DD
+          ```
+
+          Implemented port-0 commands:
+
+          - `00` DATA
+          - `01` TXDELAY — 10 ms/unit
+          - `02` PERSIST — 0..255
+          - `03` SLOTTIME — 10 ms/unit
+          - `04` TXTAIL — 10 ms/unit
+          - `05` FULLDUPLEX
+          - `FF` RETURN
+
+          ## AX.25 / FCS behavior
+
+          Host to radio:
+
+          ```text
+          C0 00 [raw AX.25 without FCS] C0
+          ```
+
+          The UV-K5 computes and appends AX.25 FCS internally, creates the HDLC/NRZI stream, and transmits Bell 202 over RF.
+
+          Radio to host:
+
+          ```text
+          C0 00 [raw AX.25 without FCS] C0
+          ```
+
+          Received RF FCS is verified inside the UV-K5 and removed before KISS DATA is sent to the host.
+
+          ## Defaults
+
+          ```text
+          TXDELAY    50  = 500 ms
+          PERSIST    63
+          SLOTTIME   10  = 100 ms
+          TXTAIL     3   = 30 ms
+          FULLDUPLEX 0
+          ```
+
+          The firmware includes a small transmit queue and p-persistence/slot-time channel access for half-duplex operation.
+
+          ## What KISS mode does NOT do
+
+          - no autonomous APRS digipeating;
+          - no autonomous position beacon;
+          - no RF to APRS-IS gating;
+          - no APRS-IS to RF gating;
+          - no NUSA proprietary `A5 5A 4E 55` UART framing;
+          - no TNC2 ASCII stream.
+
+          The host application controls packet traffic.
+
+          ## Intended use
+
+          Primary target: **APRS / AX.25 UI traffic at 1200 baud** using software that supports a serial KISS TNC on PC, Raspberry Pi/Linux, or other hosts.
+
+          Very large generic AX.25 frames and every historical hardware-TNC feature are not the primary goal of REV1A.
+
+          ## Important: not yet field tested
+
+          The following are **not yet claimed as field-proven**:
+
+          - real UART interoperability with PC/Raspberry Pi host software;
+          - RF RX → KISS host;
+          - KISS host → RF TX;
+          - KISS escaping on real traffic;
+          - TXDELAY/PERSIST/SLOTTIME/TXTAIL behavior on real RF;
+          - long-duration stability.
+
+          Users are invited to test these areas.
+
+          ## Please report your test
+
+          Open a GitHub Issue and include:
+
+          - UV-K5 hardware/board version;
+          - Normal or Standalone;
+          - PC/Raspberry Pi/other host;
+          - operating system;
+          - UART adapter/interface;
+          - host software;
+          - frequency;
+          - RF→KISS RX result;
+          - KISS→RF TX result;
+          - logs, packet examples, photos/screenshots;
+          - PASS and FAIL results.
+
+          A reproducible failure report is just as valuable as a successful test.
+
+          ## Documentation
+
+          Full English documentation:
+          `UV-K5 TNC KISS/README.md`
+
+          Bahasa Indonesia:
+          `UV-K5 TNC KISS/README_ID.md`
+
+          Community test procedure:
+          `UV-K5 TNC KISS/TESTING.md`
+
+          ## Warning
+
+          This firmware is for **UV-K5 V1**. Do not flash it to UV-K5 V3 or other hardware unless a build is explicitly released for that hardware.
+
+          Flashing custom firmware carries risk. Keep a known-good firmware image available for recovery.
+          EOF
+
+          gh release create "$TAG" \
+            "UV-K5 TNC KISS/firmware/NUSA_UVK5_TNC_KISS_REV1A_NORMAL.packed.bin" \
+            "UV-K5 TNC KISS/firmware/NUSA_UVK5_TNC_KISS_REV1A_STANDALONE.packed.bin" \
+            --repo "$REPO" \
+            --title "$TITLE" \
+            --notes-file /tmp/tnc-kiss-rev1a-notes.md \
+            --prerelease
