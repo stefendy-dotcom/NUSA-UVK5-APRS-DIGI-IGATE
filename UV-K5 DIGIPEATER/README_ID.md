@@ -1,29 +1,33 @@
 # NUSA UV-K5 APRS Digipeater — Bahasa Indonesia
 
-## Terbaru: REV1U Normal / REV1U Standalone
+## Terbaru: REV1AB Normal / REV1AB Standalone
 
-REV1U adalah firmware DIGI terbaru yang sudah diuji di lapangan. Engine Persistence Fix1 tetap dipertahankan.
-
-Perubahan utama REV1U:
-
-- beberapa potongan FIFO BK4819 dari satu packet digabung sebelum decode;
-- buffer RX 480 byte dan decode setelah sekitar 120 ms tidak ada aktivitas FSK;
-- kompatibilitas RX lebih baik terhadap beberapa device APRS; pengujian termasuk Yaesu FT-2DR dan UV-5RH;
-- symbol Bell-202 pertama sudah dimuat sebelum TX unmute;
-- LED: standby mati, RX hijau, TX merah;
-- identitas boot dikompilasi sebagai NUSA.
+REV1AB adalah keluarga firmware DIGI terbaru. Perbaikan **PATH FULL** sudah dibuktikan di RF nyata menggunakan build diagnostic REV1Z sebelum teks diagnostic dibuang.
 
 Firmware:
 
 ```text
-firmware/NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin
-firmware/NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin
+firmware/NUSA_UVK5_APRS_DIGI_REV1AB_NORMAL.packed.bin
+firmware/NUSA_UVK5_APRS_DIGI_REV1AB_STANDALONE.packed.bin
 ```
 
-Release: [rev1u](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)
+Release: [rev1ab](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1ab)
 
+### Perbaikan utama
 
-> ✅ **Persistence Fix1 — 23 September 2026:** masalah perubahan koordinat setelah power-cycle dan penyimpanan Object Name/Comment Standalone sudah diperbaiki dan **berhasil diuji pada hardware UV-K5 nyata**. Setelah upgrade Standalone, set dan simpan ulang `ObjNam` serta `BComnt` satu kali.
+- buffer retransmit/path menjadi **160 byte**;
+- WIDE2-N tetap menghasilkan trace normal `MYCALL*,WIDE2-(N-1)` bila slot address tersedia;
+- bila seluruh slot address AX.25 sudah terpakai, alias WIDE2 diturunkan langsung sehingga packet valid tidak lagi dibuang;
+- engine RX/decode kompatibilitas terbaru tetap dipertahankan;
+- LED tetap standby mati / RX hijau / TX merah;
+- Persistence Fix1 dan branding NUSA tetap dipertahankan;
+- seluruh teks diagnostic `D:...` sudah dihapus dari build produksi.
+
+Packet yang sebelumnya berhenti pada `D:PATH FULL` berhasil mencapai `D:TX OK` dan terbukti dipancarkan ulang lewat RF pada pengujian REV1Z.
+
+SHA256 Normal: `0b0611bb6bdbd5f07f12e5b51c4ad438b190e526edc790e717ecef97a9196afe`
+
+SHA256 Standalone: `7cec5d4422556113032eb34e1f86d338b0b0a5ccb6e31bf53ef74ebfa887879a`
 
 ## Terbaru khusus Standalone: REV1H
 
