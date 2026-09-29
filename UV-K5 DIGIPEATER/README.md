@@ -1,77 +1,45 @@
 # NUSA UV-K5 APRS Digipeater
 
-# Latest: REV1U Normal / REV1U Standalone
+# Latest: REV1AB Normal / REV1AB Standalone
 
-> **REV1U is the current field-tested DIGI family for both Normal and Standalone.**
+> **REV1AB is the current DIGI family. The PATH FULL forwarding fix was proven on real RF in the REV1Z diagnostic build before diagnostics were removed.**
 
 Firmware:
 
 ```text
-firmware/NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin
-firmware/NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin
+firmware/NUSA_UVK5_APRS_DIGI_REV1AB_NORMAL.packed.bin
+firmware/NUSA_UVK5_APRS_DIGI_REV1AB_STANDALONE.packed.bin
 ```
 
-Release: **[rev1u](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)**
+Release: **[rev1ab](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1ab)**
 
-## REV1U — Field-tested compatibility update
+## REV1AB — WIDE2 PATH FULL fix
 
-REV1U keeps the proven Bell 202 / AX.25 engine and Persistence Fix1, with these field-tested changes:
+REV1AB keeps the newer multi-device RX/decode engine, Persistence Fix1, NUSA branding and LED behavior from the REV1U line, while restoring reliable digipeating.
 
-- aggregate multiple BK4819 RX fragments before decoding instead of treating every RX_FINISHED as a separate packet;
-- 480-byte RX capture buffer and end-of-packet decode after about 120 ms of FSK inactivity;
-- improved compatibility with multiple APRS transmitters; field tests include Yaesu FT-2DR and UV-5RH;
-- first TX Bell-202 symbol is preloaded before unmute;
-- LED behavior: standby OFF, RX green, TX red;
-- compile-time boot identity is NUSA.
-
-REV1U Normal SHA256: `6a147bb699da71d44967ccaacf264c7810a8e9ae3e588fec2e23ebf4c0bb7414`
-
-REV1U Standalone SHA256: `9f9b1f9e74f74ffc0a09e185c07235a19a0933f2af135c3cbdae62bfbd310e58`
-
-REV1H Standalone adds these dedicated APRS controls while retaining the REV1G Bell-202 / AX.25 digipeater engine:
+The field failure was isolated with an on-radio diagnostic:
 
 ```text
-TxPwr
-APRFq
-DgCall
-DgSSID
-DgDly
-DgTail
-PosBcn
-BType
-ObjNam
-BComnt
-SymTbl
-Symbol
-BLat
-LatNS
-BLon
-LonEW
+D:PATH FULL
 ```
 
-- `BType`: select normal Station beacon or APRS Object beacon.
-- `ObjNam`: editable APRS Object Name, maximum 9 characters. Default: `NUSA-DIGI`.
-- `BComnt`: editable user comment suffix, maximum 16 characters.
-- `SymTbl`: select APRS primary `/` or alternate `\` symbol table.
-- `Symbol`: select the printable APRS symbol code.
-- Object beacon uses the APRS alive marker `*` and pseudo timestamp `111111z`.
-- The transmitted comment always starts with **`NUSA DIGI`**. The menu edits only the suffix, so this identifier cannot be removed.
+The cause was the retransmit/path builder: when a WIDE2-N packet needed a 7-byte trace address inserted, the old 95-byte retransmit buffer or a full AX.25 address list could make the valid packet get dropped before TX.
 
-Example with user suffix `WAMENA`:
+REV1AB fixes this by:
 
-```text
-...#NUSA DIGI WAMENA
-```
+- using a **160-byte retransmit/path buffer**;
+- preserving the normal traced form `MYCALL*,WIDE2-(N-1)` whenever an address slot is available;
+- when all legal AX.25 address slots are already occupied, decrementing the WIDE2 alias in place instead of dropping the packet;
+- retaining WIDE2-only operation and duplicate suppression;
+- keeping the field-tested newer RX/decode compatibility engine;
+- keeping **standby LED OFF / RX green / TX red**;
+- removing all temporary `D:...` diagnostic text from the production build.
 
-**Validation status:** REV1H Standalone Fix1 is **build verified, packed-CRC verified, and its EEPROM persistence fix has been tested successfully on real UV-K5 hardware**.
+The same RF packet that previously stopped at `D:PATH FULL` reached `D:TX OK` and was confirmed retransmitted on-air in the REV1Z diagnostic firmware.
 
-SHA256:
+REV1AB Normal SHA256: `0b0611bb6bdbd5f07f12e5b51c4ad438b190e526edc790e717ecef97a9196afe`
 
-```text
-d567603ced9ef646109e2049218ab65d71028ec7572b09f33d12ca27e87e47b2
-```
-
----
+REV1AB Standalone SHA256: `7cec5d4422556113032eb34e1f86d338b0b0a5ccb6e31bf53ef74ebfa887879a`
 
 ## Persistence Fix1 — 23 September 2026
 
@@ -94,8 +62,8 @@ Custom APRS digipeater firmware for the **Quansheng UV-K5**, developed and field
 
 Current firmware choices are:
 
-1. **REV1U — Normal APRS Digipeater**
-2. **REV1U Standalone — Dedicated Autostart APRS Digipeater**
+1. **REV1AB — Normal APRS Digipeater**
+2. **REV1AB Standalone — Dedicated Autostart APRS Digipeater**
 
 > **Important:** Flash only the `.packed.bin` file intended for the UV-K5 firmware updater. Keep a known-good firmware available for recovery before experimenting with custom firmware.
 
