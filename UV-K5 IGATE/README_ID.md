@@ -1,33 +1,34 @@
 # NUSA UV-K5 iGATE — Bahasa Indonesia
 
-## Firmware UV-K5 terbaru: REV1U
+## Firmware UV-K5 terbaru: REV1AB
 
-REV1U adalah firmware UV-K5 iGATE terbaru untuk versi Normal dan Standalone. Protokol UART dan firmware ESP32 tetap sama; yang diperbarui adalah engine RX UV-K5 serta LED/branding.
+REV1AB adalah firmware UV-K5 iGATE terbaru untuk Normal dan Standalone.
 
-- Standby: LED mati.
-- RX: LED hijau.
-- TX: LED merah.
-- Potongan RX BK4819 digabung sebelum AX.25 decode.
-- Persistence Fix1 tetap dipertahankan.
-- Identitas boot dikompilasi sebagai NUSA.
-- **ESP32 tidak perlu firmware baru.**
+- engine RX/decode aggregate terbaru tetap dipertahankan;
+- frame RF AX.25/FCS yang valid langsung dikirim ke UART ESP32 setelah decode;
+- kalibrasi UART DP32 dikembalikan ke divisor asli `Frequency / 39053` untuk target sekitar 38400 baud di jalur fisik;
+- versi Normal: **Long F2 langsung masuk APRS/iGATE**, tidak tergantung assignment tombol lama di EEPROM;
+- Persistence Fix1, branding NUSA, dan LED standby mati / RX hijau / TX merah tetap dipertahankan;
+- framing UART NUSA tidak berubah.
 
 Firmware:
 
 ```text
-firmware/NUSA_UVK5_IGATE_REV1U_NORMAL.packed.bin
-firmware/NUSA_UVK5_IGATE_REV1U_STANDALONE.packed.bin
+firmware/NUSA_UVK5_IGATE_REV1AB_NORMAL.packed.bin
+firmware/NUSA_UVK5_IGATE_REV1AB_STANDALONE.packed.bin
 ```
 
-Release: [rev1u](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)
+Release: [rev1ab](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1ab)
+
+**Status pengujian:** REV1AB sudah compile/pack verified. Pada diagnosis terakhir UV-K5 sudah decode packet valid, tetapi capture ESP32 menerima byte listrik tanpa header NUSA yang valid, sehingga konfirmasi akhir RF→IS masih bergantung pada perbaikan jalur/wiring UART fisik. Jalur REV1A RF→ESP32→APRS-IS tetap menjadi baseline lama yang sebelumnya sudah terbukti di lapangan.
 
 
-**NUSA UV-K5 iGATE** menjadikan Quansheng UV-K5/UV-5K sebagai sisi radio/modem RF untuk APRS iGate. REV1U adalah firmware UV-K5 terbaru untuk Normal dan Standalone. ESP32 DevKit/WROOM-32 atau ESP32-C3 menangani Wi-Fi, APRS-IS, filtering, dan dashboard web.
+**NUSA UV-K5 iGATE** menjadikan Quansheng UV-K5/UV-5K sebagai sisi radio/modem RF untuk APRS iGate. REV1AB adalah firmware UV-K5 terbaru untuk Normal dan Standalone. ESP32 DevKit/WROOM-32 atau ESP32-C3 menangani Wi-Fi, APRS-IS, filtering, dan dashboard web.
 
 Tersedia dua varian firmware UV-K5:
 
-1. **REV1U Normal** — APRS/iGate masuk secara manual, biasanya Long F2.
-2. **REV1U Standalone** — mode iGate dedicated aktif otomatis setelah radio dinyalakan.
+1. **REV1AB Normal** — APRS/iGate masuk secara manual, biasanya Long F2.
+2. **REV1AB Standalone** — mode iGate dedicated aktif otomatis setelah radio dinyalakan.
 
 Kedua varian UV-K5 menggunakan **protokol UART yang sama**. Paket binary terpisah tersedia untuk ESP32 klasik/WROOM-32 dan ESP32-C3.
 
