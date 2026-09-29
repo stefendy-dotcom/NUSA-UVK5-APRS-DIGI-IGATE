@@ -43,6 +43,7 @@ REV1AB replaces REV1U for the current UV-K5 firmware family.
 |---|---|---|---|---|
 | **UV-K5 DIGIPEATER** | UV-K5 only | Standalone APRS RF digipeater | **Normal REV1AB / Standalone REV1AB** | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
 | **UV-K5 iGATE** | UV-K5 + ESP32 | RF ↔ APRS-IS gateway | **Normal REV1AB / Standalone REV1AB** | **[Open iGATE](./UV-K5%20IGATE/)** |
+| **UV-K5 TNC KISS** | UV-K5 V1 + UART host | Standard serial KISS Bell 202 / AX.25 TNC | **REV1A Experimental — Untested** | **[Open TNC KISS](./UV-K5%20TNC%20KISS/)** |
 
 ---
 
@@ -57,7 +58,7 @@ Main features:
 - Normal and Standalone variants
 - Position beacon
 - TOCALL: `APZUAG`
-- **REV1U** is the current field-tested DIGI engine for both Normal and Standalone; Persistence Fix1 is retained
+- **REV1AB** is the current DIGI release; its PATH FULL forwarding fix was proven on-air in the REV1Z diagnostic build and Persistence Fix1 is retained
 
 **Documentation and firmware:**
 
@@ -245,8 +246,37 @@ This path is implemented and is pending full on-air field validation.
 
 ---
 
+---
+
+# UV-K5 V1 TNC KISS — Experimental
+
+The **NUSA UV-K5 TNC KISS REV1A** project turns a UV-K5 V1 into a host-controlled Bell 202 / AX.25 1200-baud TNC using **standard serial KISS** at 38400 8N1.
+
+> ⚠️ **REV1A is currently UNTESTED end-to-end on real hardware with host KISS software.**
+> It is published as an experimental/community-test release so users can help validate RX, TX, UART/KISS interoperability, and timing parameters.
+
+Two variants are provided:
+
+- **Normal:** Long F2 enters KISS TNC mode; EXIT leaves it.
+- **Standalone:** power-on automatically enters KISS TNC mode.
+
+KISS mode uses standard `C0/DB/DC/DD` framing and port 0 commands DATA, TXDELAY, PERSIST, SLOTTIME, TXTAIL, FULLDUPLEX, and RETURN. AX.25 FCS is handled internally by the radio and is not carried in KISS DATA.
+
+There is **no proprietary NUSA iGATE UART header**, no autonomous DIGI, no iGate, and no automatic position beacon while KISS mode is active.
+
+**Documentation:**
+
+- **[TNC KISS English README](./UV-K5%20TNC%20KISS/README.md)**
+- **[TNC KISS Bahasa Indonesia](./UV-K5%20TNC%20KISS/README_ID.md)**
+- **[Community Test Guide](./UV-K5%20TNC%20KISS/TESTING.md)**
+
+**Experimental release:**
+
+### [Download NUSA UV-K5 TNC KISS REV1A →](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/tnc-kiss-rev1a)
+
 ## Releases
 
+- **Experimental / community test — TNC KISS REV1A:** [tnc-kiss-rev1a](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/tnc-kiss-rev1a)
 - **Latest — REV1AB family (DIGI + iGATE, Normal + Standalone):** [rev1ab](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1ab)
 - **Superseded — REV1U:** [rev1u](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1u)
 - **Digipeater Normal REV1G Fix1:** [rev1g-fix1](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/rev1g-fix1)
