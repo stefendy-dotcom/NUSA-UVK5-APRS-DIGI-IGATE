@@ -1,0 +1,153 @@
+name: Publish NUSA UV-K5 REV1AB
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/publish-rev1ab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download verified REV1AB firmware
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://map.aprsid.com/static/nusa-uvk5-v1-rev1ab-family"
+
+          mkdir -p "UV-K5 DIGIPEATER/firmware" "UV-K5 IGATE/firmware"
+
+          curl -fL "$BASE/NUSA_UVK5_APRS_DIGI_REV1AB_NORMAL.packed.bin" \
+            -o "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AB_NORMAL.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_APRS_DIGI_REV1AB_STANDALONE.packed.bin" \
+            -o "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AB_STANDALONE.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_IGATE_REV1AB_NORMAL.packed.bin" \
+            -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AB_NORMAL.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_IGATE_REV1AB_STANDALONE.packed.bin" \
+            -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AB_STANDALONE.packed.bin"
+
+      - name: Verify SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "0b0611bb6bdbd5f07f12e5b51c4ad438b190e526edc790e717ecef97a9196afe  UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AB_NORMAL.packed.bin" | sha256sum -c -
+          echo "7cec5d4422556113032eb34e1f86d338b0b0a5ccb6e31bf53ef74ebfa887879a  UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AB_STANDALONE.packed.bin" | sha256sum -c -
+          echo "20e57e4ac5580cdfda075840cf9fa06cf86033d3104935cbc021bb704f0761a8  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AB_NORMAL.packed.bin" | sha256sum -c -
+          echo "6993211ca68ba09272e70617168578810abbefb68a4e386a94e197c0a78cdafc  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AB_STANDALONE.packed.bin" | sha256sum -c -
+
+      - name: Commit REV1AB firmware files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AB_NORMAL.packed.bin"
+          git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AB_STANDALONE.packed.bin"
+          git add "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AB_NORMAL.packed.bin"
+          git add "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AB_STANDALONE.packed.bin"
+
+          if ! git diff --cached --quiet; then
+            git commit -m "release: add REV1AB firmware family"
+            git push
+          fi
+
+      - name: Create REV1AB GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          TAG="rev1ab"
+          TITLE="NUSA UV-K5 APRS REV1AB — WIDE2 Forwarding Fix"
+
+          git fetch origin main
+          HEAD_SHA="$(git rev-parse origin/main)"
+
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release delete "$TAG" --repo "$REPO" --cleanup-tag --yes
+          fi
+
+          git tag -f "$TAG" "$HEAD_SHA"
+          git push origin "refs/tags/$TAG" --force
+
+          cat > /tmp/rev1ab-notes.md <<'EOF'
+          # NUSA UV-K5 APRS REV1AB
+
+          Current UV-K5 firmware family for DIGI and iGATE, Normal and Standalone.
+
+          ## Included firmware
+
+          - DIGI Normal REV1AB
+          - DIGI Standalone REV1AB
+          - iGATE Normal REV1AB
+          - iGATE Standalone REV1AB
+
+          ## DIGI — field-proven PATH FULL fix
+
+          The DIGI regression was isolated on real hardware with the diagnostic result:
+
+          `D:PATH FULL`
+
+          The received APRS packet decoded correctly, but the retransmit/path builder dropped it before TX when WIDE2-N needed another 7-byte address and the old retransmit/path space was exhausted.
+
+          REV1AB fixes this by:
+
+          - increasing the retransmit/path buffer to 160 bytes;
+          - preserving normal traced WIDE2-N output (`MYCALL*,WIDE2-(N-1)`) whenever an address slot is available;
+          - when all legal AX.25 address slots are occupied, decrementing WIDE2-N in place instead of dropping the valid packet;
+          - retaining duplicate suppression and WIDE2-only operation.
+
+          The same packet that previously stopped at `D:PATH FULL` reached `D:TX OK` in the REV1Z diagnostic build and was confirmed retransmitted over RF. REV1AB removes the temporary diagnostic text while keeping that fix.
+
+          ## Common
+
+          - Newer aggregate RX/decode compatibility engine retained.
+          - Persistence Fix1 retained.
+          - LED: standby OFF / RX green / TX red.
+          - Boot/version branding compiled as NUSA.
+          - Temporary diagnostic screen strings removed.
+
+          ## iGATE
+
+          - Valid RF AX.25/FCS frames are sent to the ESP32 UART immediately after decode.
+          - DP32 UART calibration restored to the original `Frequency / 39053` divisor for the intended ~38400-baud wire rate.
+          - Normal firmware: Long F2 is hard-bound to APRS/iGATE, independent of stale EEPROM side-key assignments.
+          - NUSA binary UART framing remains unchanged.
+
+          **iGATE validation note:** REV1AB iGATE is compile/pack verified. During the latest diagnosis the UV-K5 decoded valid packets, while the ESP32 UART diagnostic showed electrical bytes without valid NUSA headers. Final RF→IS confirmation therefore still depends on correcting the physical UART path/wiring. The older REV1A RF→ESP32→APRS-IS path remains the previously field-tested baseline.
+
+          ## Bahasa Indonesia
+
+          REV1AB memperbaiki bug DIGI yang sudah ditemukan secara pasti di lapangan: packet berhasil didecode tetapi berhenti di `D:PATH FULL` sebelum TX. Buffer retransmit/path sekarang 160 byte dan packet WIDE2 valid tidak lagi dibuang hanya karena seluruh slot address AX.25 sudah terpakai.
+
+          Fix tersebut sudah terbukti mendigi normal pada build diagnostic REV1Z. REV1AB adalah build produksi tanpa teks diagnostic.
+
+          Firmware iGATE REV1AB sudah compile/pack verified dan memakai kembali kalibrasi UART DP32 yang benar. Pengujian akhir RF→IS masih menunggu jalur UART fisik diperbaiki sesuai hasil diagnostic terakhir.
+
+          Flash only the appropriate *.packed.bin file for your UV-K5 variant.
+          EOF
+
+          gh release create "$TAG" \
+            "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AB_NORMAL.packed.bin" \
+            "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AB_STANDALONE.packed.bin" \
+            "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AB_NORMAL.packed.bin" \
+            "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AB_STANDALONE.packed.bin" \
+            --repo "$REPO" \
+            --title "$TITLE" \
+            --notes-file /tmp/rev1ab-notes.md
