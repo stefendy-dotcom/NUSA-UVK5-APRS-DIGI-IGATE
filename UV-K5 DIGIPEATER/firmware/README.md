@@ -4,8 +4,15 @@ Official NUSA UV-K5 APRS DIGI firmware binaries.
 
 ## Current
 
+- `NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin` — Normal, current field-tested release.
+- `NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin` — Standalone, current field-tested release.
+
+REV1U keeps Persistence Fix1 and adds field-tested multi-device RX improvements (aggregated BK4819 RX fragments, 480-byte RX buffer, decode after about 120 ms FSK inactivity), corrected LED behavior (standby OFF, RX green, TX red), and NUSA boot branding.
+
+## Previous
+
 - `NUSA_UVK5_APRS_DIGI_REV1G.packed.bin` — Normal, field-tested RF baseline.
-- `NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin` — latest dedicated Standalone revision; build/CRC verified, hardware field test pending.
+- `NUSA_UVK5_APRS_DIGI_REV1H_STANDALONE.packed.bin` — previous dedicated Standalone revision.
 
 ## Legacy Standalone
 

@@ -1,5 +1,14 @@
 # Changelog
 
+## REV1U — 2026-09-25
+
+Field-tested UV-K5 firmware update for REV1U Normal and REV1U Standalone (release `rev1u`).
+
+- Adopts the field-tested REV1T multi-device RX engine (aggregated BK4819 fragments, 480-byte buffer, decode after about 120 ms FSK inactivity).
+- Corrected LED behavior and NUSA boot branding.
+- Persistence Fix1 remains included.
+- iGATE UART protocol and ESP32 side are unchanged; no new ESP32 firmware is required.
+
 ## Persistence Fix1 — 2026-09-23
 
 Field-tested EEPROM persistence maintenance release for REV1A Normal and REV1B Standalone.
