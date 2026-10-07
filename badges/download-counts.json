@@ -4,10 +4,10 @@
   "counts": {
     "digi_normal": 14,
     "digi_standalone": 25,
-    "igate_normal": 5,
-    "igate_standalone": 9,
+    "igate_normal": 6,
+    "igate_standalone": 10,
     "esp32_igate": 5,
     "esp32c3_igate": 4,
-    "total": 62
+    "total": 64
   }
 }
