@@ -20,6 +20,7 @@ CATEGORIES = {
     "igate-standalone": ("iGATE Standalone", "blue"),
     "esp32-igate": ("ESP32 iGATE", "blue"),
     "esp32c3-igate": ("ESP32-C3 iGATE", "blue"),
+    "gps-tracker": ("GPS Tracker", "blue"),
 }
 
 
@@ -62,6 +63,11 @@ def classify_asset(filename):
     # .packed.bin and ordinary .bin are both covered here, including UV-K5 V3.
     if not name.endswith(".BIN"):
         return None
+
+    # Match the GPS Tracker before generic IGATE/DIGI; count firmware BIN only.
+    # Source archives (.zip), source patches, and checksums must not inflate counts.
+    if "GPS_APRS_TRACKER" in name or "GPS-APRS-TRACKER" in name:
+        return "gps-tracker"
 
     if "IGATE" in name:
         return "igate-standalone" if "STANDALONE" in name else "igate-normal"
@@ -127,6 +133,7 @@ def main():
                 "igate_standalone": counts["igate-standalone"],
                 "esp32_igate": counts["esp32-igate"],
                 "esp32c3_igate": counts["esp32c3-igate"],
+                "gps_tracker": counts["gps-tracker"],
                 "total": total,
             },
         },

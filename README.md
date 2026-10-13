@@ -11,9 +11,11 @@
 [![ESP32 iGATE Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Fesp32-igate.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases)
 [![ESP32-C3 iGATE Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Fesp32c3-igate.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases)
 
+[![GPS APRS Tracker Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Fgps-tracker.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/gps-tracker-rev1d)
+
 [![TOTAL Firmware Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Ftotal.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases)
 
-> These counters are **cumulative across all GitHub Release assets**, from the first public release through the latest release. They update automatically after release events and are rechecked every hour. Files such as `SHA256SUMS.txt` are not counted.
+> These counters are **cumulative across all GitHub Release assets**, from the first public release through the latest release. They update automatically after release events and are rechecked every hour. Files such as `SHA256SUMS.txt` are not counted. **GPS Tracker downloads are counted from the GitHub Release firmware asset, not raw/repository file links.**
 
 APRS projects for the **Quansheng UV-K5 / UV-5K**, developed by **YF9UAG, Indonesia**.
 

@@ -4,9 +4,17 @@
 
 > **FIELD-TESTED FOR STATIONARY 1-MINUTE BEACONS (13 October 2026).** REV1D successfully sent RF position packets into APRS-IS, and the GPS serial input no longer caused unintended RF TX in the reported hardware test. This is **not** a claim that SmartBeaconing in motion, all GPS hardware, or long-term reliability have been validated. Not for UV-K5 Board V3/PY32F071.
 
+## Download counter
+
+[![GPS Tracker Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fstefendy-dotcom%2FNUSA-UVK5-APRS-DIGI-IGATE%2Fmain%2Fbadges%2Fgps-tracker.json&style=for-the-badge&logo=github)](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/gps-tracker-rev1d)
+
+> The counter tracks **cumulative GitHub Release downloads of GPS Tracker firmware BIN files**, not source ZIPs, raw.githubusercontent.com, or regular GitHub repository file views. The workflow refreshes badges periodically.
+
 ## Download
 
-- **Firmware:** [NUSA_UVK5_GPS_APRS_TRACKER_REV1D_PTT_GUARD_PRETEST.packed.bin](firmware/NUSA_UVK5_GPS_APRS_TRACKER_REV1D_PTT_GUARD_PRETEST.packed.bin) — packed UV-K5 flasher file, **60,506 bytes**
+- **Firmware (counted):** [Download GPS Tracker REV1D from GitHub Release](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/download/gps-tracker-rev1d/NUSA_UVK5_GPS_APRS_TRACKER_REV1D_PTT_GUARD_PRETEST.packed.bin) — packed UV-K5 flasher file, **60,506 bytes**.
+- **GitHub Release page:** [GPS Tracker REV1D — field-tested fixed 1-minute beacon](https://github.com/stefendy-dotcom/NUSA-UVK5-APRS-DIGI-IGATE/releases/tag/gps-tracker-rev1d).
+- **Repository firmware mirror (not counted):** [same REV1D BIN](firmware/NUSA_UVK5_GPS_APRS_TRACKER_REV1D_PTT_GUARD_PRETEST.packed.bin).
 - **Complete source and tests:** [REV1D source ZIP](source/NUSA_UVK5_GPS_APRS_TRACKER_REV1D_PTT_GUARD_PRETEST_SOURCE.zip)
 - [Browsable source patch](source/nusa_uvk5_gps_rev1d.patch), [GPS NMEA parser](source/app/nusa_gps_core.c), [GPS auto-baud](source/app/nusa_gps_autobaud.c), and [build instructions](SOURCE_BUILD.md)
 - [Recorded on-air test and known limitations](FIELD_TEST.md)

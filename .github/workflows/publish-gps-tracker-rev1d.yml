@@ -1,0 +1,69 @@
+name: Publish NUSA UV-K5 GPS APRS Tracker REV1D
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - '.github/workflows/publish-gps-tracker-rev1d.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source and tested firmware
+        uses: actions/checkout@v4
+
+      - name: Verify exact field-tested binary and source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "UV-K5 GPS APRS TRACKER"
+          sha256sum --check SHA256SUMS.txt
+
+      - name: Validate counter classifier
+        run: python3 -m unittest discover -s .github/scripts -p 'test_download_counts.py'
+
+      - name: Publish release once, without resetting existing download count
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="gps-tracker-rev1d"
+          BIN="UV-K5 GPS APRS TRACKER/firmware/NUSA_UVK5_GPS_APRS_TRACKER_REV1D_PTT_GUARD_PRETEST.packed.bin"
+          ZIP="UV-K5 GPS APRS TRACKER/source/NUSA_UVK5_GPS_APRS_TRACKER_REV1D_PTT_GUARD_PRETEST_SOURCE.zip"
+          NOTES="UV-K5 GPS APRS TRACKER/FIELD_TEST.md"
+
+          # Do NOT delete/re-upload assets on rerun: that resets GitHub's
+          # download_count and would falsify cumulative historical totals.
+          if gh release view "$TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
+            echo "Existing release found, preserving assets and downloads."
+            gh release view "$TAG" --repo "$GH_REPO" --json assets --jq '.assets[].name'
+            test "$(gh release view "$TAG" --repo "$GH_REPO" --json assets --jq '[.assets[].name | select(. == "NUSA_UVK5_GPS_APRS_TRACKER_REV1D_PTT_GUARD_PRETEST.packed.bin")] | length')" -eq 1
+          else
+            gh release create "$TAG" "$BIN" "$ZIP" --repo "$GH_REPO" --target "$GITHUB_SHA" --title "NUSA UV-K5 GPS APRS Tracker REV1D — RF field-tested interval beacon" --notes-file "$NOTES" --prerelease
+          fi
+
+      - name: Update cumulative download counters now
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git checkout -B main origin/main
+          python3 .github/scripts/update_download_counts.py
+          if git diff --quiet -- badges/; then
+            echo "Counters already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add badges/
+          git commit -m "chore: update cumulative download counters"
+          git push origin HEAD:main
