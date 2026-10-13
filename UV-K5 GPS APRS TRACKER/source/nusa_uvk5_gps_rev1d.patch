@@ -1,0 +1,555 @@
+diff --git a/Makefile b/Makefile
+index 210665d..17ad6fe 100644
+--- a/Makefile
++++ b/Makefile
+@@ -31,7 +31,7 @@ ENABLE_BOOT_BEEPS               ?= 0
+ ENABLE_SHOW_CHARGE_LEVEL        ?= 0
+ ENABLE_REVERSE_BAT_SYMBOL       ?= 0
+ ENABLE_NO_CODE_SCAN_TIMEOUT     ?= 1
+-ENABLE_AM_FIX                   ?= 1
++ENABLE_AM_FIX                    ?= 0
+ ENABLE_SQUELCH_MORE_SENSITIVE   ?= 1
+ ENABLE_FASTER_CHANNEL_SCAN      ?= 1
+ ENABLE_RSSI_BAR                 ?= 1
+@@ -40,8 +40,9 @@ ENABLE_COPY_CHAN_TO_VFO         ?= 1
+ ENABLE_REDUCE_LOW_MID_TX_POWER  ?= 0
+ ENABLE_BYP_RAW_DEMODULATORS     ?= 0
+ ENABLE_BLMIN_TMP_OFF            ?= 0
+-ENABLE_SCAN_RANGES              ?= 1
++ENABLE_SCAN_RANGES              ?= 0
+ ENABLE_APRS                     ?= 1
++ENABLE_NUSA_GPS                 ?= 1
+ # Fill-in digipeater. OFF for shipped images on purpose: this radio transmits
+ # FFSK 1200/1800, not Bell 202, so repeats are decodable by software modems but
+ # not by hardware TNCs — fine for a closed group, not for public infrastructure.
+@@ -85,14 +86,14 @@ ENABLE_REGA                     ?= 0
+ # Thank you @reppad
+ ENABLE_EXTRA_UART_CMD           ?= 0
+ # Radio remote control over UART: key injection, get-state, TX power/bw/mod, display mirror
+-ENABLE_UART_RC                  ?= 1
++ENABLE_UART_RC                  ?= 0
+ 
+ # ---- F4HWN MODS ----
+ 
+ ENABLE_FEAT_F4HWN               ?= 1
+ ENABLE_FEAT_F4HWN_GAME          ?= 0
+ ENABLE_FEAT_F4HWN_SCREENSHOT    ?= 0
+-ENABLE_FEAT_F4HWN_SPECTRUM      ?= 1
++ENABLE_FEAT_F4HWN_SPECTRUM      ?= 0
+ ENABLE_FEAT_F4HWN_RX_TX_TIMER   ?= 0
+ ENABLE_FEAT_F4HWN_CHARGING_C    ?= 0
+ ENABLE_FEAT_F4HWN_SLEEP         ?= 0
+@@ -200,6 +201,10 @@ ifeq ($(ENABLE_FMRADIO),1)
+ endif
+ OBJS += app/generic.o
+ OBJS += app/main.o
++ifeq ($(ENABLE_NUSA_GPS),1)
++OBJS += app/nusa_gps_core.o
++OBJS += app/nusa_gps_autobaud.o
++endif
+ OBJS += app/menu.o
+ ifeq ($(ENABLE_SPECTRUM), 1)
+ OBJS += app/spectrum.o
+@@ -290,8 +295,8 @@ ifeq ($(ENABLE_FEAT_F4HWN),1)
+ 	AUTHOR_STRING_1 ?= EGZUMER
+ 	VERSION_STRING_1 ?= v0.22
+ 
+-	AUTHOR_STRING_2 ?= TA1JS
+-	VERSION_STRING_2 ?= v1.3
++	AUTHOR_STRING_2 ?= NUSA
++	VERSION_STRING_2 ?= GPS1D
+ 
+ 	EDITION_STRING ?= APRS
+ 
+@@ -435,6 +440,9 @@ endif
+ ifeq ($(ENABLE_AM_FIX),1)
+ 	CFLAGS  += -DENABLE_AM_FIX
+ endif
++ifeq ($(ENABLE_NUSA_GPS),1)
++	CFLAGS  += -DENABLE_NUSA_GPS
++endif
+ ifeq ($(ENABLE_APRS),1)
+ 	CFLAGS  += -DENABLE_APRS
+ endif
+@@ -577,7 +585,7 @@ LDFLAGS += -z noexecstack -mcpu=cortex-m0 -nostartfiles -Wl,-T,firmware.ld -Wl,-
+ LDFLAGS += -Wl,-u,_sbrk
+ 
+ # Use newlib-nano instead of newlib
+-LDFLAGS += --specs=nano.specs
++LDFLAGS += --specs=nano.specs -L/tmp/nusa-gps-tracker-work/toolchain/usr/lib/arm-none-eabi/newlib/thumb/v6-m/nofp
+ 
+ ifeq ($(DEBUG),1)
+ 	ASFLAGS += -g
+diff --git a/app/app.c b/app/app.c
+index 850e08d..18828ff 100644
+--- a/app/app.c
++++ b/app/app.c
+@@ -42,6 +42,34 @@
+ #endif
+ #ifdef ENABLE_APRS
+     #include "app/aprs_minimal.h"
++#ifdef ENABLE_NUSA_GPS
++#include "app/nusa_gps_core.h"
++#include "app/nusa_gps_autobaud.h"
++#include "bsp/dp32g030/dma.h"
++#include "driver/uart.h"
++static uint16_t gps_read_index;
++static uint8_t gps_baud_started;
++
++static void NUSA_GPS_Poll(void) {
++    const uint16_t end = (uint16_t)(DMA_CH0->ST & 0xFFFu) % sizeof(UART_DMA_Buffer);
++    extern volatile uint32_t gGlobalSysTickCounter;
++    if (!gps_baud_started) {
++        NUSA_GPS_AutoBaud_Reset(gGlobalSysTickCounter, nusa_gps.good_sentences);
++        gps_baud_started = 1u;
++    }
++    while (gps_read_index != end) {
++        NUSA_GPS_Feed(UART_DMA_Buffer[gps_read_index], gGlobalSysTickCounter);
++        gps_read_index = (uint16_t)((gps_read_index + 1u) % sizeof(UART_DMA_Buffer));
++    }
++    const int next = NUSA_GPS_AutoBaud_Update(gGlobalSysTickCounter,
++                                               nusa_gps.good_sentences);
++    if (next >= 0) {
++        NUSA_GPS_ResetStream();
++        UART_GPS_SetBaudIndex((uint8_t)next);
++        gps_read_index = 0u; // DMA destination counter reset by UART_Init
++    }
++}
++#endif
+ #endif
+ #include "ARMCM0.h"
+ #include "audio.h"
+@@ -1188,6 +1216,13 @@ static void CheckKeys(void)
+ #endif
+ 
+ // -------------------- PTT ------------------------
++#ifndef ENABLE_NUSA_GPS
++// NUSA GPS Tracker REV1D:
++// The external MIC-/UART RX connector also drives the PC5 PTT sense line.
++// UART NMEA bursts can be mistaken for a 30ms PTT press and key RF.
++// This tracker-only build disables physical/external PTT *at the source*.
++// APRS transmissions still call RADIO_PrepareTX() independently.
++
+ #ifdef ENABLE_FEAT_F4HWN
+     if (gSetting_set_ptt_session)
+     {
+@@ -1299,6 +1334,7 @@ static void CheckKeys(void)
+         gPttDebounceCounter = 0;
+ #endif
+ 
++#endif // !ENABLE_NUSA_GPS
+ // --------------------- OTHER KEYS ----------------------------
+ 
+     // scan the hardware keys
+@@ -1432,11 +1468,15 @@ void APP_TimeSlice10ms(void)
+ #endif
+ 
+ #ifdef ENABLE_UART
++#ifdef ENABLE_NUSA_GPS
++    NUSA_GPS_Poll();
++#else
+     if (UART_IsCommandAvailable()) {
+         __disable_irq();
+         UART_HandleCommand();
+         __enable_irq();
+     }
++#endif
+ #endif
+ 
+     if (gReducedService)
+@@ -1926,6 +1966,11 @@ void APP_InjectKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
+ 
+ static void ProcessKey(KEY_Code_t Key, bool bKeyPressed, bool bKeyHeld)
+ {
++#ifdef ENABLE_NUSA_GPS
++    // Defense-in-depth: disallow any injected/synthetic PTT event too.
++    // Bootloader PTT detection is not part of application firmware.
++    if (Key == KEY_PTT) return;
++#endif
+ #ifdef ENABLE_APRS
+     if (bKeyPressed && !bKeyHeld && APRS_DismissMessage()) {
+         if (Key != KEY_PTT)
+diff --git a/app/aprs_minimal.c b/app/aprs_minimal.c
+index 5c14b50..3f7ed07 100644
+--- a/app/aprs_minimal.c
++++ b/app/aprs_minimal.c
+@@ -18,6 +18,10 @@
+ #include <stdint.h>
+ 
+ #include "aprs_minimal.h"
++#ifdef ENABLE_NUSA_GPS
++#include "nusa_gps_core.h"
++#include "../ui/ui.h"
++#endif
+ #include "app.h"
+ #include "../audio.h"
+ #include "../functions.h"
+@@ -262,7 +266,11 @@ bool APRS_Configured(void)
+ // (aprsorg/aprs-deviceid#333) as "UV-K5 TA1JS", so aprs.fi and friends name the
+ // radio instead of showing it as experimental. It replaced APZUVK; the registry
+ // no longer hands out APZ*, which was only ever a stopgap.
++#ifdef ENABLE_NUSA_GPS
++#define APRS_TOCALL "APZUAG"
++#else
+ #define APRS_TOCALL "APOVK5"
++#endif
+ 
+ static uint16_t APRS_BuildHeader(uint8_t *frame)
+ {
+@@ -274,8 +282,12 @@ static uint16_t APRS_BuildHeader(uint8_t *frame)
+     uint16_t idx = 0;
+     AX25_EncodeAddress(APRS_TOCALL, 0, false, &frame[idx]); idx += 7;
+     AX25_EncodeAddress(src, gEeprom.APRS_SSID & 0x0F, false, &frame[idx]); idx += 7;
++    #ifdef ENABLE_NUSA_GPS
++    AX25_EncodeAddress("WIDE2", 2, true, &frame[idx]); idx += 7;
++#else
+     AX25_EncodeAddress("WIDE1", 1, false, &frame[idx]); idx += 7;
+     AX25_EncodeAddress("WIDE2", 1, true,  &frame[idx]); idx += 7;
++#endif
+     frame[idx++] = 0x03; // Control: UI frame
+     frame[idx++] = 0xF0; // PID: no layer 3
+     return idx;
+@@ -328,17 +340,30 @@ static void APRS_TransmitBeaconCoords(int32_t lat_udeg, int32_t lon_udeg)
+     idx += APRS_PosDigits(&frame[idx], (uint32_t)v, 1);
+     frame[idx++] = (uint8_t)hemi;
+     frame[idx++] = '>';
++#ifdef ENABLE_NUSA_GPS
++    // Standard APRS course/speed extension: degrees / knots.
++    const uint16_t course = nusa_gps.heading_deg % 360u;
++    const uint16_t knots = (uint16_t)((uint32_t)nusa_gps.speed_kmh10 * 100u / 1852u);
++    frame[idx++] = '0' + (course / 100u);
++    frame[idx++] = '0' + (course / 10u) % 10u;
++    frame[idx++] = '0' + course % 10u;
++    frame[idx++] = '/';
++    frame[idx++] = '0' + (knots / 100u) % 10u;
++    frame[idx++] = '0' + (knots / 10u) % 10u;
++    frame[idx++] = '0' + knots % 10u;
++#endif
+     for (uint8_t i = 0; i < 31 && gEeprom.APRS_COMMENT[i]; i++)
+         frame[idx++] = (uint8_t)gEeprom.APRS_COMMENT[i];
+ 
+     APRS_TxFrame(frame, idx);
+ }
+ 
++#ifndef ENABLE_NUSA_GPS
+ static void APRS_TransmitBeacon(void)
+ {
+-    // Position and comment come from the menu settings (Loc / Cmnt).
+     APRS_TransmitBeaconCoords(gEeprom.APRS_LATITUDE, gEeprom.APRS_LONGITUDE);
+ }
++#endif
+ 
+ // ---------------------------------------------------------------------------
+ // APRS RX (listen mode, enabled by the "APRS" menu item).
+@@ -735,9 +760,21 @@ static void APRS_EmitRaw(const uint8_t *frame, uint16_t len)
+ // "41.15N\n27.84E" for the Loc menu display (two lines)
+ void APRS_FormatLatLon(char *out)
+ {
++#ifdef ENABLE_NUSA_GPS
++    if (!NUSA_GPS_Fresh(gGlobalSysTickCounter)) {
++        memcpy(out, "NO GPS FIX\0", 11);
++        return;
++    }
++    char *p = APRS_FmtCoord(out, nusa_gps.latitude_udeg, 'N', 'S');
++#else
+     char *p = APRS_FmtCoord(out, gEeprom.APRS_LATITUDE, 'N', 'S');
++#endif
+     *p++ = '\n';
++#ifdef ENABLE_NUSA_GPS
++    p = APRS_FmtCoord(p, nusa_gps.longitude_udeg, 'E', 'W');
++#else
+     p = APRS_FmtCoord(p, gEeprom.APRS_LONGITUDE, 'E', 'W');
++#endif
+     *p = 0;
+ }
+ 
+@@ -1237,7 +1274,11 @@ static uint16_t gBeaconCountdown_500ms;
+ // station shows up quickly, then every APRS_INTERVAL minutes. Interval 0 = off.
+ void APRS_ResetBeaconTimer(void)
+ {
++    #ifdef ENABLE_NUSA_GPS
++    gBeaconCountdown_500ms = 0u; // 0 = SmartBeacon, 1..60 = minutes
++#else
+     gBeaconCountdown_500ms = (gEeprom.APRS_INTERVAL > 0) ? 30u : 0u;
++#endif
+ }
+ 
+ // Initialize APRS system
+@@ -1270,12 +1311,18 @@ void APRS_TransmitNow(void)
+ {
+     if (gAPRSState != APRS_STATE_IDLE || !APRS_Configured())
+         return;
+-
++#ifdef ENABLE_NUSA_GPS
++    if (!NUSA_GPS_Fresh(gGlobalSysTickCounter) || gCurrentFunction == FUNCTION_TRANSMIT) return;
++#endif
+     gAPRSState = APRS_STATE_TRANSMITTING;
+ 
+-    APRS_StopListening();  // TX reuses the modem and the capture buffer
+-
++    APRS_StopListening();
++#ifdef ENABLE_NUSA_GPS
++    APRS_TransmitBeaconCoords(nusa_gps.latitude_udeg, nusa_gps.longitude_udeg);
++    NUSA_GPS_MarkSent(gGlobalSysTickCounter);
++#else
+     APRS_TransmitBeacon();
++#endif
+ 
+     gAPRSState = APRS_STATE_WAITING;  // APRS_Task re-arms RX afterwards
+ }
+@@ -1397,12 +1444,21 @@ void APRS_Task(void)
+                 return;
+             }
+         }
++#ifdef ENABLE_NUSA_GPS
++        if (gScreenToDisplay != DISPLAY_MENU && !gRxCapturing && APRS_Configured() &&
++            NUSA_GPS_NeedsBeacon(gGlobalSysTickCounter, gEeprom.APRS_INTERVAL)) {
++            APRS_BeaconAt(nusa_gps.latitude_udeg, nusa_gps.longitude_udeg);
++            NUSA_GPS_MarkSent(gGlobalSysTickCounter);
++            return;
++        }
++#else
+         // Automatic position beacon at the configured interval (keep-alive).
+         if (gBeaconCountdown_500ms > 0 && --gBeaconCountdown_500ms == 0) {
+             gBeaconCountdown_500ms = (uint16_t)gEeprom.APRS_INTERVAL * 120u;
+-            APRS_TransmitNow();  // -> WAITING; RX re-arms after the cooldown
++            APRS_TransmitNow();
+             return;
+         }
++#endif
+         if (!gRxArmed) {
+             APRS_RxArm();
+         } else if (gRxCapturing && ++gRxStuckTicks > 2) {
+diff --git a/app/menu.c b/app/menu.c
+index 548c930..6ef0501 100644
+--- a/app/menu.c
++++ b/app/menu.c
+@@ -1929,6 +1929,24 @@ static void MENU_Key_EXIT(bool bKeyPressed, bool bKeyHeld)
+ 
+ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
+ {
++#ifdef ENABLE_APRS
++    // NUSA REV1C: long MENU saves the callsign before its 9-char limit.
++    // Normal short MENU must advance the cursor, not close the editor.
++    if (bKeyHeld && bKeyPressed && gIsInSubMenu &&
++        UI_MENU_GetCurrentMenuId() == MENU_APRS_CALL && edit_index >= 0) {
++        if (aprs_pair_first != 0xFF) {
++            edit[edit_index] = '_';  // discard unfinished two-digit symbol
++            aprs_pair_first = 0xFF;
++        }
++        gFlagAcceptSetting = true;
++        gAskForConfirmation = 0;
++        gIsInSubMenu = false;
++        edit_index = -1;
++        gRequestDisplayScreen = DISPLAY_MENU;
++        gBeepToPlay = BEEP_1KHZ_60MS_OPTIONAL;
++        return;
++    }
++#endif
+     if (bKeyHeld || !bKeyPressed)
+         return;
+ 
+@@ -2092,21 +2110,23 @@ static void MENU_Key_MENU(const bool bKeyPressed, const bool bKeyHeld)
+             return;
+         }
+         else
+-        {   // editing APRS string fields: MENU saves whatever has been typed.
+-            // It used to step the cursor one character per press and only save
+-            // once the cursor reached the end of the field, so committing a
+-            // two-character message meant ~29 further MENU presses and looked
+-            // like a hang (reported in ta1js#1). EXIT still backspaces.
+-            if (aprs_pair_first != 0xFF && edit_index >= 0)
+-            {   // drop a half-typed digit pair instead of storing the digit
+-                const int len = APRS_EditMaxLen(UI_MENU_GetCurrentMenuId(), NULL);
+-                edit[edit_index] = (len == 9) ? '_' : ' ';
+-                aprs_pair_first  = 0xFF;
++        {
++            const int id = UI_MENU_GetCurrentMenuId();
++            if (aprs_pair_first != 0xFF && edit_index >= 0) {
++                // Do not commit a partially typed two-digit character.
++                edit[edit_index] = (APRS_EditMaxLen(id, NULL) == 9) ? '_' : ' ';
++                aprs_pair_first = 0xFF;
+             }
+-            gFlagAcceptSetting  = true;
++            if (id == MENU_APRS_CALL && ++edit_index < 9) {
++                // Call editor behaves like the UV-K5 character editor:
++                // short MENU moves to the next letter; long MENU saves early.
++                return;
++            }
++            // Other APRS text fields retain their REV1B quick-save behavior.
++            gFlagAcceptSetting = true;
+             gAskForConfirmation = 0;
+-            gIsInSubMenu        = false;
+-            edit_index          = -1;
++            gIsInSubMenu = false;
++            edit_index = -1;
+             return;
+         }
+     }
+diff --git a/driver/uart.c b/driver/uart.c
+index b339292..dea8a12 100644
+--- a/driver/uart.c
++++ b/driver/uart.c
+@@ -23,6 +23,21 @@
+ 
+ static bool UART_IsLogEnabled;
+ uint8_t UART_DMA_Buffer[256];
++#ifdef ENABLE_NUSA_GPS
++static uint8_t nusa_gps_baud_index;  // 0:9600, 1:38400, 2:115200
++void UART_GPS_SetBaudIndex(uint8_t index)
++{
++    if (index >= 3u || index == nusa_gps_baud_index) return;
++    nusa_gps_baud_index = index;
++    UART_Init();  // Reinitialize UART RX FIFO and DMA from offset zero.
++}
++uint32_t UART_GPS_GetBaud(void)
++{
++    static const uint32_t baud[3] = {9600u, 38400u, 115200u};
++    return baud[nusa_gps_baud_index];
++}
++#endif
++
+ 
+ void UART_Init(void)
+ {
+@@ -40,7 +55,14 @@ void UART_Init(void)
+         Frequency = 48000000U - Frequency;
+     }
+ 
++#ifdef ENABLE_NUSA_GPS
++    // DP32G030 calibrated UART divisor. The same correction is used by
++    // the original Quansheng 38400-baud UART driver.
++    static const uint32_t baud_divisor[3] = {9766u, 39053u, 117158u};
++    UART1->BAUD = Frequency / baud_divisor[nusa_gps_baud_index];
++#else
+     UART1->BAUD = Frequency / 39053U;
++#endif
+     UART1->CTRL = UART_CTRL_RXEN_BITS_ENABLE | UART_CTRL_TXEN_BITS_ENABLE | UART_CTRL_RXDMAEN_BITS_ENABLE;
+     UART1->RXTO = 4;
+     UART1->FC = 0;
+diff --git a/driver/uart.h b/driver/uart.h
+index f25a552..e73811d 100644
+--- a/driver/uart.h
++++ b/driver/uart.h
+@@ -23,6 +23,10 @@
+ extern uint8_t UART_DMA_Buffer[256];
+ 
+ void UART_Init(void);
++#ifdef ENABLE_NUSA_GPS
++void UART_GPS_SetBaudIndex(uint8_t index);
++uint32_t UART_GPS_GetBaud(void);
++#endif
+ void UART_Send(const void *pBuffer, uint32_t Size);
+ void UART_LogSend(const void *pBuffer, uint32_t Size);
+ 
+diff --git a/main.c b/main.c
+index 6b48f90..1a7d59e 100644
+--- a/main.c
++++ b/main.c
+@@ -44,6 +44,9 @@
+ #include "app/dtmf.h"
+ #ifdef ENABLE_APRS
+     #include "app/aprs_minimal.h"
++#ifdef ENABLE_NUSA_GPS
++#include "app/nusa_gps_core.h"
++#endif
+ #endif
+ #include "bsp/dp32g030/gpio.h"
+ #include "bsp/dp32g030/syscon.h"
+@@ -95,7 +98,9 @@ void Main(void)
+ 
+ #ifdef ENABLE_UART
+     UART_Init();
++    #ifndef ENABLE_NUSA_GPS
+     UART_Send(UART_Version, strlen(UART_Version));
++#endif
+ #endif
+ 
+     // Not implementing authentic device checks
+@@ -117,6 +122,9 @@ void Main(void)
+     SETTINGS_WriteBuildOptions();
+     SETTINGS_LoadCalibration();
+ 
++#ifdef ENABLE_NUSA_GPS
++    NUSA_GPS_Reset();
++#endif
+ #ifdef ENABLE_APRS
+     APRS_Init();
+ #endif
+@@ -196,8 +204,17 @@ void Main(void)
+         gMenuListCount++;
+     }
+ 
++#ifdef ENABLE_NUSA_GPS
++    // External serial NMEA shares the PTT line. Never wait for PC5 high
++    // during tracker application startup, or continuous GPS data can prevent
++    // booting. The bootloader/DFU PTT sampling is separate and unchanged.
++    #define NUSA_PTT_RELEASED() true
++#else
++    #define NUSA_PTT_RELEASED() GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT)
++#endif
++
+     // wait for user to release all butts before moving on
+-    if (!GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT) ||
++    if (!NUSA_PTT_RELEASED() ||
+          KEYBOARD_Poll() != KEY_INVALID ||
+          BootMode != BOOT_MODE_NORMAL)
+     {   // keys are pressed
+@@ -207,7 +224,7 @@ void Main(void)
+         // 500ms
+         for (int i = 0; i < 50;)
+         {
+-            i = (GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT) && KEYBOARD_Poll() == KEY_INVALID) ? i + 1 : 0;
++            i = (NUSA_PTT_RELEASED() && KEYBOARD_Poll() == KEY_INVALID) ? i + 1 : 0;
+             SYSTEM_DelayMs(10);
+         }
+         gKeyReading0 = KEY_INVALID;
+@@ -259,7 +276,7 @@ void Main(void)
+             // 500ms
+             for (int i = 0; i < 50;)
+             {
+-                i = (GPIO_CheckBit(&GPIOC->DATA, GPIOC_PIN_PTT) && KEYBOARD_Poll() == KEY_INVALID) ? i + 1 : 0;
++                i = (NUSA_PTT_RELEASED() && KEYBOARD_Poll() == KEY_INVALID) ? i + 1 : 0;
+                 SYSTEM_DelayMs(10);
+             }
+             gKeyReading0 = KEY_INVALID;
+diff --git a/ui/menu.c b/ui/menu.c
+index 07dd84d..ddaba78 100644
+--- a/ui/menu.c
++++ b/ui/menu.c
+@@ -1229,13 +1229,18 @@ void UI_DisplayMenu(void)
+                 sprintf(String, "%-10.10s", gAPRS_MsgText);
+             break;
+         case MENU_APRS_INTV:
++#ifdef ENABLE_NUSA_GPS
++            if (gSubMenuSelection == 0)
++                strcpy(String, "SMART");
++#else
+             if (gSubMenuSelection == 0)
+                 strcpy(String, "OFF");
++#endif
+             else
+                 sprintf(String, "%d min", gSubMenuSelection);
+             break;
+         case MENU_APRS_CALL:
+-            // Display callsign from edit array
++            // Draw cursor after value render, like the channel-name editor.
+             if (gIsInSubMenu && edit_index >= 0) {
+                 sprintf(String, "%-9s", edit);
+             } else {
+@@ -1345,6 +1350,15 @@ void UI_DisplayMenu(void)
+         }
+     }
+ 
++#ifdef ENABLE_APRS
++    if (UI_MENU_GetCurrentMenuId() == MENU_APRS_CALL &&
++        gIsInSubMenu && edit_index >= 0 && edit_index < 9) {
++        // Text value is displayed on row 2; the caret is on row 4.
++        UI_PrintString("^", menu_item_x1 - 1 + (8 * edit_index),
++                       0, 4, 8);
++    }
++#endif
++
+     if (UI_MENU_GetCurrentMenuId() == MENU_SLIST1 || UI_MENU_GetCurrentMenuId() == MENU_SLIST2 || UI_MENU_GetCurrentMenuId() == MENU_SLIST3)
+     {
+         i = UI_MENU_GetCurrentMenuId() - MENU_SLIST1;

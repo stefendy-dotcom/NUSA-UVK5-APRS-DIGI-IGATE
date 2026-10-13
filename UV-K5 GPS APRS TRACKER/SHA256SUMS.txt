@@ -1,0 +1,3 @@
+# SHA-256 checksums (REV1D field-tested binary/source archive)
+32f564ffff0f2961ae7fddc433adaf188fee6bc4d822bbbc0dd25319a1a479e5  firmware/NUSA_UVK5_GPS_APRS_TRACKER_REV1D_PTT_GUARD_PRETEST.packed.bin
+46bc3138d21d69a99e341649930ff74fb09cdea9bbfde593ffc9e0e34a0812f4  source/NUSA_UVK5_GPS_APRS_TRACKER_REV1D_PTT_GUARD_PRETEST_SOURCE.zip

@@ -33,9 +33,13 @@ REV1AB replaces REV1U for the current UV-K5 firmware family.
 
 > ✅ **Persistence Fix1 — 23 September 2026:** power-cycle persistence fixes for DIGI Normal/Standalone and iGATE Normal/Standalone have been **tested successfully on real hardware**. See **[PERSISTENCE_FIX1.md](./PERSISTENCE_FIX1.md)**.
 
-> There are **two different projects** in this repository.  
+> The repository contains **separate firmware families** for Digipeater, iGATE, TNC KISS, and GPS APRS Tracker. The latest Digipeater/iGATE release information above is independent of the GPS Tracker firmware.  
 > The Digipeater can run on the UV-K5 by itself.  
 > The iGate uses a **UV-K5 + ESP32**.
+
+## 📍 GPS APRS Tracker REV1D — RF-tested 13 October 2026
+
+The **[UV-K5 GPS APRS TRACKER](./UV-K5%20GPS%20APRS%20TRACKER/)** turns a **UV-K5/K6 Board V1** into a standalone GNSS position beacon using an external UART NMEA GPS (9600/38400/115200 auto-baud), with fixed interval or SmartBeaconing. **No ESP32/RP2040 required.** The operator confirmed **35 APRS-IS receptions** of `YB3DE-3>APZUAG,WIDE2-2` via `YH3NPX-1` at the **1-minute** setting, plus **no unintended TX after REV1D PTT Guard**. This does **not** verify moving SmartBeaconing or long-term hardware/electrical compatibility. **Physical voice PTT is disabled** in REV1D. See the project README for wiring and startup safety caveats.
 
 ## Choose your project
 
@@ -44,6 +48,7 @@ REV1AB replaces REV1U for the current UV-K5 firmware family.
 | **UV-K5 DIGIPEATER** | UV-K5 only | Standalone APRS RF digipeater | **Normal REV1AB / Standalone REV1AB** | **[Open DIGIPEATER](./UV-K5%20DIGIPEATER/)** |
 | **UV-K5 iGATE** | UV-K5 + ESP32 | RF ↔ APRS-IS gateway | **Normal REV1AB / Standalone REV1AB** | **[Open iGATE](./UV-K5%20IGATE/)** |
 | **UV-K5 TNC KISS** | UV-K5 V1 + UART host | Standard serial KISS Bell 202 / AX.25 TNC | **REV1A Experimental — Untested** | **[Open TNC KISS](./UV-K5%20TNC%20KISS/)** |
+| **UV-K5 GPS APRS TRACKER** | UV-K5/K6 V1 + external UART GPS, **no ESP32** | Standalone GNSS APRS tracker (SmartBeaconing / interval) | **REV1D — Stationary 1-min beacon RF→IS field-tested** | **[Open GPS TRACKER](./UV-K5%20GPS%20APRS%20TRACKER/)** |
 
 ---
 
