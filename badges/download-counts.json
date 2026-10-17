@@ -3,12 +3,12 @@
   "description": "Cumulative GitHub Release Asset download counts grouped by firmware family.",
   "counts": {
     "digi_normal": 16,
-    "digi_standalone": 25,
+    "digi_standalone": 26,
     "igate_normal": 6,
     "igate_standalone": 10,
     "esp32_igate": 6,
     "esp32c3_igate": 5,
     "gps_tracker": 1,
-    "total": 69
+    "total": 70
   }
 }
