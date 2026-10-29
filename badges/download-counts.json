@@ -6,9 +6,9 @@
     "digi_standalone": 27,
     "igate_normal": 6,
     "igate_standalone": 10,
-    "esp32_igate": 6,
-    "esp32c3_igate": 5,
+    "esp32_igate": 8,
+    "esp32c3_igate": 7,
     "gps_tracker": 2,
-    "total": 75
+    "total": 79
   }
 }
