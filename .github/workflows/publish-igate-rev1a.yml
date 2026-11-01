@@ -2,9 +2,6 @@ name: Publish NUSA UV-K5 iGATE REV1A
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - ".github/workflows/publish-igate-rev1a.yml"
 
 permissions:
   contents: read
