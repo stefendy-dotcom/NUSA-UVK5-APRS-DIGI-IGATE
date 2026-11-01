@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Authenticate as stefendy[bot]
+      - name: Authenticate as stefendy-nusa[bot]
         id: bot
         uses: actions/create-github-app-token@v3
         with:
@@ -25,7 +25,7 @@ jobs:
           token: ${{ steps.bot.outputs.token }}
           fetch-depth: 0
 
-      - name: Configure verified stefendy[bot] commit identity
+      - name: Configure verified stefendy-nusa[bot] commit identity
         env:
           GH_TOKEN: ${{ steps.bot.outputs.token }}
           BOT_SLUG: ${{ steps.bot.outputs.app-slug }}
@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
           BOT_LOGIN="${BOT_SLUG}[bot]"
-          [[ "$BOT_LOGIN" == "stefendy[bot]" ]] || { echo "Unexpected bot: $BOT_LOGIN"; exit 1; }
+          [[ "$BOT_LOGIN" == "stefendy-nusa[bot]" ]] || { echo "Unexpected bot: $BOT_LOGIN"; exit 1; }
           BOT_ID="$(gh api "/users/${BOT_LOGIN}" --jq '.id')"
           git config user.name "$BOT_LOGIN"
           git config user.email "${BOT_ID}+${BOT_LOGIN}@users.noreply.github.com"
