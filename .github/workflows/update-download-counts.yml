@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: cumulative-download-counter
@@ -19,12 +19,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Authenticate as stefendy-nusa[bot]
+        id: bot
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.NUSA_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NUSA_APP_PRIVATE_KEY }}
+          permission-contents: write
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot.outputs.token }}
+
+      - name: Configure verified stefendy-nusa[bot] commit identity
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          BOT_SLUG: ${{ steps.bot.outputs.app-slug }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BOT_LOGIN="${BOT_SLUG}[bot]"
+          [[ "$BOT_LOGIN" == "stefendy-nusa[bot]" ]] || { echo "Unexpected bot: $BOT_LOGIN"; exit 1; }
+          BOT_ID="$(gh api "/users/${BOT_LOGIN}" --jq '.id')"
+          git config user.name "$BOT_LOGIN"
+          git config user.email "${BOT_ID}+${BOT_LOGIN}@users.noreply.github.com"
 
       - name: Calculate cumulative Release Asset downloads
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot.outputs.token }}
         run: python3 .github/scripts/update_download_counts.py
 
       - name: Commit changed counters
@@ -37,8 +60,6 @@ jobs:
             exit 0
           fi
 
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add badges/
           git commit -m "chore: update cumulative download counters"

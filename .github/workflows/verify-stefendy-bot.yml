@@ -1,0 +1,50 @@
+name: Verify stefendy-nusa[bot] GitHub App
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-stefendy-bot.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check required GitHub App configuration
+        env:
+          CLIENT_ID: ${{ vars.NUSA_APP_CLIENT_ID }}
+          PRIVATE_KEY: ${{ secrets.NUSA_APP_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$CLIENT_ID" || { echo 'Missing NUSA_APP_CLIENT_ID repository variable'; exit 1; }
+          test -n "$PRIVATE_KEY" || { echo 'Missing NUSA_APP_PRIVATE_KEY repository secret'; exit 1; }
+
+      - name: Create stefendy-nusa GitHub App installation token
+        id: bot
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.NUSA_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NUSA_APP_PRIVATE_KEY }}
+          permission-contents: read
+
+      - name: Verify authentic bot identity and repository access
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          APP_SLUG: ${{ steps.bot.outputs.app-slug }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BOT_LOGIN="${APP_SLUG}[bot]"
+          if [[ "$BOT_LOGIN" != 'stefendy-nusa[bot]' ]]; then
+            echo "ERROR: Expected stefendy-nusa[bot], got $BOT_LOGIN"
+            exit 1
+          fi
+          BOT_ID="$(gh api "/users/${BOT_LOGIN}" --jq '.id')"
+          test -n "$BOT_ID"
+          gh api "/repos/${GITHUB_REPOSITORY}" --jq '.full_name'
+          echo "Verified GitHub App identity: ${BOT_LOGIN} (id ${BOT_ID})"
+          echo 'No commit, tag, release, or file was changed.'

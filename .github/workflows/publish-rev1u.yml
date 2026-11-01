@@ -1,24 +1,42 @@
 name: Publish NUSA UV-K5 REV1U
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - '.github/workflows/publish-rev1u.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Authenticate as stefendy-nusa[bot]
+        id: bot
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.NUSA_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NUSA_APP_PRIVATE_KEY }}
+          permission-contents: write
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          token: ${{ steps.bot.outputs.token }}
           fetch-depth: 0
+
+      - name: Configure verified stefendy-nusa[bot] commit identity
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          BOT_SLUG: ${{ steps.bot.outputs.app-slug }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BOT_LOGIN="${BOT_SLUG}[bot]"
+          [[ "$BOT_LOGIN" == "stefendy-nusa[bot]" ]] || { echo "Unexpected bot: $BOT_LOGIN"; exit 1; }
+          BOT_ID="$(gh api "/users/${BOT_LOGIN}" --jq '.id')"
+          git config user.name "$BOT_LOGIN"
+          git config user.email "${BOT_ID}+${BOT_LOGIN}@users.noreply.github.com"
 
       - name: Download verified REV1U firmware
         shell: bash
@@ -53,8 +71,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
           git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1U_NORMAL.packed.bin"
           git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1U_STANDALONE.packed.bin"
@@ -68,7 +84,7 @@ jobs:
 
       - name: Create REV1U GitHub Release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
         shell: bash
         run: |
           set -euo pipefail

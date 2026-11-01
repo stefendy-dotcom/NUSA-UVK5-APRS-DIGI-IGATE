@@ -1,21 +1,40 @@
 name: Publish NUSA UV-K5 GPS APRS Tracker REV1D
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - '.github/workflows/publish-gps-tracker-rev1d.yml'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      - name: Authenticate as stefendy-nusa[bot]
+        id: bot
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.NUSA_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NUSA_APP_PRIVATE_KEY }}
+          permission-contents: write
+
       - name: Checkout source and tested firmware
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot.outputs.token }}
+
+      - name: Configure verified stefendy-nusa[bot] commit identity
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          BOT_SLUG: ${{ steps.bot.outputs.app-slug }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BOT_LOGIN="${BOT_SLUG}[bot]"
+          [[ "$BOT_LOGIN" == "stefendy-nusa[bot]" ]] || { echo "Unexpected bot: $BOT_LOGIN"; exit 1; }
+          BOT_ID="$(gh api "/users/${BOT_LOGIN}" --jq '.id')"
+          git config user.name "$BOT_LOGIN"
+          git config user.email "${BOT_ID}+${BOT_LOGIN}@users.noreply.github.com"
 
       - name: Verify exact field-tested binary and source archive
         shell: bash
@@ -29,7 +48,7 @@ jobs:
 
       - name: Publish release once, without resetting existing download count
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
           GH_REPO: ${{ github.repository }}
         shell: bash
         run: |
@@ -51,7 +70,7 @@ jobs:
 
       - name: Update cumulative download counters now
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot.outputs.token }}
         shell: bash
         run: |
           set -euo pipefail
@@ -62,8 +81,6 @@ jobs:
             echo "Counters already current."
             exit 0
           fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add badges/
           git commit -m "chore: update cumulative download counters"
           git push origin HEAD:main
