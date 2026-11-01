@@ -2,10 +2,6 @@ name: Verify stefendy-nusa[bot] GitHub App
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/verify-stefendy-bot.yml'
 
 permissions:
   contents: read
