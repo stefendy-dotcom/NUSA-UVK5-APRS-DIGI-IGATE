@@ -1,10 +1,6 @@
 name: Publish NUSA UV-K5 TNC KISS REV1A
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - '.github/workflows/publish-tnc-kiss-rev1a.yml'
   workflow_dispatch:
 
 permissions:
