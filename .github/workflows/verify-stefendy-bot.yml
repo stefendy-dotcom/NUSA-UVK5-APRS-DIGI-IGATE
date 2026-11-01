@@ -1,4 +1,4 @@
-name: Verify stefendy[bot] GitHub App
+name: Verify stefendy-nusa[bot] GitHub App
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ jobs:
           test -n "$CLIENT_ID" || { echo 'Missing NUSA_APP_CLIENT_ID repository variable'; exit 1; }
           test -n "$PRIVATE_KEY" || { echo 'Missing NUSA_APP_PRIVATE_KEY repository secret'; exit 1; }
 
-      - name: Create stefendy GitHub App installation token
+      - name: Create stefendy-nusa GitHub App installation token
         id: bot
         uses: actions/create-github-app-token@v3
         with:
@@ -35,8 +35,8 @@ jobs:
         run: |
           set -euo pipefail
           BOT_LOGIN="${APP_SLUG}[bot]"
-          if [[ "$BOT_LOGIN" != 'stefendy[bot]' ]]; then
-            echo "ERROR: Expected stefendy[bot], got $BOT_LOGIN"
+          if [[ "$BOT_LOGIN" != 'stefendy-nusa[bot]' ]]; then
+            echo "ERROR: Expected stefendy-nusa[bot], got $BOT_LOGIN"
             exit 1
           fi
           BOT_ID="$(gh api "/users/${BOT_LOGIN}" --jq '.id')"
