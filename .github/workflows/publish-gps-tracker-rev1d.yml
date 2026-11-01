@@ -1,10 +1,6 @@
 name: Publish NUSA UV-K5 GPS APRS Tracker REV1D
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - '.github/workflows/publish-gps-tracker-rev1d.yml'
   workflow_dispatch:
 
 permissions:
