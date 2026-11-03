@@ -8,7 +8,7 @@
     "igate_standalone": 10,
     "esp32_igate": 8,
     "esp32c3_igate": 7,
-    "gps_tracker": 2,
-    "total": 80
+    "gps_tracker": 3,
+    "total": 81
   }
 }
