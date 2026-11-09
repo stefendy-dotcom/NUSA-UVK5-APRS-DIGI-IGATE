@@ -1,0 +1,174 @@
+name: Publish NUSA UV-K5 REV1AG IJV-AGC RX
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/publish-rev1ag.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Authenticate as stefendy-nusa[bot]
+        id: bot
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.NUSA_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NUSA_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot.outputs.token }}
+          fetch-depth: 0
+
+      - name: Configure verified stefendy-nusa[bot] commit identity
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          BOT_SLUG: ${{ steps.bot.outputs.app-slug }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BOT_LOGIN="${BOT_SLUG}[bot]"
+          [[ "$BOT_LOGIN" == "stefendy-nusa[bot]" ]] || { echo "Unexpected bot: $BOT_LOGIN"; exit 1; }
+          BOT_ID="$(gh api "/users/${BOT_LOGIN}" --jq '.id')"
+          git config user.name "$BOT_LOGIN"
+          git config user.email "${BOT_ID}+${BOT_LOGIN}@users.noreply.github.com"
+
+      - name: Download verified REV1AG firmware
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="https://map.aprsid.com/static/nusa-uvk5-v1-rev1ag-ijv-agc-rx"
+
+          mkdir -p "UV-K5 DIGIPEATER/firmware" "UV-K5 IGATE/firmware" /tmp/rev1ag-assets
+
+          curl -fL "$BASE/NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_NORMAL.packed.bin"             -o "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_NORMAL.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_STANDALONE.packed.bin"             -o "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_STANDALONE.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_IGATE_REV1AG_IJV_AGC_NORMAL.packed.bin"             -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AG_IJV_AGC_NORMAL.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_IGATE_REV1AG_IJV_AGC_STANDALONE.packed.bin"             -o "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AG_IJV_AGC_STANDALONE.packed.bin"
+
+          curl -fL "$BASE/NUSA_UVK5_V1_REV1AG_IJV_AGC_RX_FAMILY.zip"             -o "/tmp/rev1ag-assets/NUSA_UVK5_V1_REV1AG_IJV_AGC_RX_FAMILY.zip"
+
+      - name: Verify REV1AG SHA256
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "a037cd860b33e643750bac7b9a071c931bd8e6e63d1bf1a79454f1505426184a  UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_NORMAL.packed.bin" | sha256sum -c -
+          echo "bbd7c16e956b1813fe15eb301f0971a31d3484064f38bf58078a2a7e690e9658  UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_STANDALONE.packed.bin" | sha256sum -c -
+          echo "025a6953eb3442ac1a9067dfadbdb8c17b1a0015ced5766bf425c28f766a93ba  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AG_IJV_AGC_NORMAL.packed.bin" | sha256sum -c -
+          echo "2c22715ee9c3cff39bf2f3111d94ecf0b14f5c46ae9b0056cf30f0cd27683479  UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AG_IJV_AGC_STANDALONE.packed.bin" | sha256sum -c -
+          echo "5dd6946bf1316227787018b22007994bfc8d770b8eaf4e2ceb94f8fe7fe75661  /tmp/rev1ag-assets/NUSA_UVK5_V1_REV1AG_IJV_AGC_RX_FAMILY.zip" | sha256sum -c -
+
+      - name: Commit REV1AG firmware files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_NORMAL.packed.bin"
+          git add "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_STANDALONE.packed.bin"
+          git add "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AG_IJV_AGC_NORMAL.packed.bin"
+          git add "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AG_IJV_AGC_STANDALONE.packed.bin"
+
+          if ! git diff --cached --quiet; then
+            git commit -m "release: add REV1AG IJV-style AGC RX firmware family"
+            git push
+          fi
+
+      - name: Create REV1AG GitHub Release
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          REPO="${{ github.repository }}"
+          TAG="rev1ag"
+          TITLE="NUSA UV-K5 APRS REV1AG — IJV-style Maximum AGC RX"
+
+          git fetch origin main
+          HEAD_SHA="$(git rev-parse origin/main)"
+
+          if gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release delete "$TAG" --repo "$REPO" --cleanup-tag --yes
+          fi
+
+          git tag -f "$TAG" "$HEAD_SHA"
+          git push origin "refs/tags/$TAG" --force
+
+          cat > /tmp/rev1ag-notes.md <<'EOF'
+          # NUSA UV-K5 APRS REV1AG — IJV-style Maximum AGC RX
+
+          REV1AG updates the UV-K5 V1 DIGI and iGATE receiver gain strategy after direct analysis of the uploaded IJV V3 firmware.
+
+          ## RX method
+
+          - BK4819 hardware AGC remains enabled / automatic.
+          - The highest AGC gain-table step is raised from approximately -7 dB:
+            - REG13 = 0x03BE
+          - to the maximum front-end setting:
+            - REG13 = 0x03FF (0 dB)
+          - Lower AGC steps remain unchanged, so the BK4819 can still reduce gain automatically when a strong signal is received.
+          - No SatCom +9 dB RF-path/filter modification is copied; that IJV feature is associated with a different RF path and is not used for APRS VHF.
+          - No experimental REV1AF +6 dB post-FM-demod gain is used.
+
+          This provides maximum weak-signal gain while retaining automatic protection against strong-signal overload.
+
+          ## DIGI baseline
+
+          DIGI REV1AG is based on REV1AC and retains:
+
+          - WIDE1-1 fill-in compatibility.
+          - WIDE2 handling.
+          - field-proven PATH FULL fix.
+          - aggregate APRS RX/decode engine.
+          - duplicate suppression.
+          - persistence fixes.
+          - existing Bell-202 TX behavior.
+
+          ## iGATE baseline
+
+          iGATE REV1AG is based on REV1AB iGATE and retains:
+
+          - RF AX.25/FCS decode.
+          - RF-to-IS UART export.
+          - calibrated DP32 UART behavior.
+          - Normal and Standalone operation.
+          - persistence and LED behavior.
+
+          ## Included firmware
+
+          - NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_NORMAL.packed.bin
+          - NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_STANDALONE.packed.bin
+          - NUSA_UVK5_IGATE_REV1AG_IJV_AGC_NORMAL.packed.bin
+          - NUSA_UVK5_IGATE_REV1AG_IJV_AGC_STANDALONE.packed.bin
+          - NUSA_UVK5_V1_REV1AG_IJV_AGC_RX_FAMILY.zip
+
+          ## SHA-256
+
+          ```text
+          a037cd860b33e643750bac7b9a071c931bd8e6e63d1bf1a79454f1505426184a  NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_NORMAL.packed.bin
+          bbd7c16e956b1813fe15eb301f0971a31d3484064f38bf58078a2a7e690e9658  NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_STANDALONE.packed.bin
+          025a6953eb3442ac1a9067dfadbdb8c17b1a0015ced5766bf425c28f766a93ba  NUSA_UVK5_IGATE_REV1AG_IJV_AGC_NORMAL.packed.bin
+          2c22715ee9c3cff39bf2f3111d94ecf0b14f5c46ae9b0056cf30f0cd27683479  NUSA_UVK5_IGATE_REV1AG_IJV_AGC_STANDALONE.packed.bin
+          5dd6946bf1316227787018b22007994bfc8d770b8eaf4e2ceb94f8fe7fe75661  NUSA_UVK5_V1_REV1AG_IJV_AGC_RX_FAMILY.zip
+          ```
+
+          ## Status
+
+          Binary patch, pack/unpack round-trip and CRC have been verified. REV1AG is released for real-RF field validation of weak-signal sensitivity and strong-signal AGC behavior.
+
+          Flash only the appropriate *.packed.bin for your UV-K5 V1 variant.
+          EOF
+
+          gh release create "$TAG"             "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_NORMAL.packed.bin"             "UV-K5 DIGIPEATER/firmware/NUSA_UVK5_APRS_DIGI_REV1AG_IJV_AGC_STANDALONE.packed.bin"             "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AG_IJV_AGC_NORMAL.packed.bin"             "UV-K5 IGATE/firmware/NUSA_UVK5_IGATE_REV1AG_IJV_AGC_STANDALONE.packed.bin"             "/tmp/rev1ag-assets/NUSA_UVK5_V1_REV1AG_IJV_AGC_RX_FAMILY.zip"             --repo "$REPO"             --title "$TITLE"             --notes-file /tmp/rev1ag-notes.md
