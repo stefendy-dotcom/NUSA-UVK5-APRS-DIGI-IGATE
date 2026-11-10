@@ -54,7 +54,7 @@ jobs:
           - `firmware/F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin` — resident F4HWN Labs firmware REV1E
           - `apps/NUSA_DIGI_REV1D_30MIN_BEACON.app` — NUSA DIGI overlay app REV1D
 
-          Both files are required. Their revision numbers differ because the resident same-callsign fix is in the REV1E main firmware; the REV1D app binary is unchanged.
+          Both files are required. Their revision numbers differ because the resident same-callsign fix is in the REV1E main firmware; the REV1D app binary is unchanged. GitHub Release offers the APP in a ZIP because GitHub blocks uploading .app extensions as release assets. The raw .app remains in this repository.
 
           ## Features
 
@@ -115,6 +115,35 @@ jobs:
           TAG="uvk5-v3-f4hwn-labs-rev1e"
           BIN="UV-K5 V3 F4HWN LABS/firmware/F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin"
           APP="UV-K5 V3 F4HWN LABS/apps/NUSA_DIGI_REV1D_30MIN_BEACON.app"
+          ZIP="NUSA_DIGI_REV1D_30MIN_BEACON_APP.zip"
+          zip -9 -j "$ZIP" "$APP"
+          unzip -p "$ZIP" NUSA_DIGI_REV1D_30MIN_BEACON.app | sha256sum | grep -q '^10592e1469b54a38a68bfd94522fcdc22b14e6e349dec2ec1fec704103b87033  -"UV-K5 V3 F4HWN LABS/README.md"
+          git fetch origin main
+          HEAD_SHA="$(git rev-parse origin/main)"
+          if gh release view "$TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
+            echo "Existing release found; preserving assets and download counters."
+            for ITEM in "$BIN" "$ZIP"; do
+              BASENAME="${ITEM##*/}"
+              if ! gh release view "$TAG" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$BASENAME"; then
+                gh release upload "$TAG" "$ITEM" --repo "$GH_REPO"
+              fi
+            done
+          else
+            gh release create "$TAG" "$BIN" "$ZIP" --repo "$GH_REPO" --target "$HEAD_SHA" --title "NUSA DIGI UV-K5 V3 F4HWN Labs REV1E — Same Callsign Auto Beacon" --notes-file "$NOTES"
+          fi
+
+      - name: Verify release assets
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets[].name'
+          test "$(gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets | length')" -eq 2
+          gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin"
+          gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "NUSA_DIGI_REV1D_30MIN_BEACON_APP.zip"
+
           NOTES="UV-K5 V3 F4HWN LABS/README.md"
           git fetch origin main
           HEAD_SHA="$(git rev-parse origin/main)"
