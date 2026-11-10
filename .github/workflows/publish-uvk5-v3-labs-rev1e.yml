@@ -105,7 +105,7 @@ jobs:
             git push origin HEAD:main
           fi
 
-      - name: Publish GitHub Release with two binary assets
+      - name: Publish GitHub Release with firmware BIN and APP ZIP
         env:
           GH_TOKEN: ${{ steps.bot.outputs.token }}
           GH_REPO: ${{ github.repository }}
@@ -116,20 +116,23 @@ jobs:
           BIN="UV-K5 V3 F4HWN LABS/firmware/F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin"
           APP="UV-K5 V3 F4HWN LABS/apps/NUSA_DIGI_REV1D_30MIN_BEACON.app"
           ZIP="NUSA_DIGI_REV1D_30MIN_BEACON_APP.zip"
+          NOTES="UV-K5 V3 F4HWN LABS/README.md"
           zip -9 -j "$ZIP" "$APP"
-          unzip -p "$ZIP" NUSA_DIGI_REV1D_30MIN_BEACON.app | sha256sum | grep -q '^10592e1469b54a38a68bfd94522fcdc22b14e6e349dec2ec1fec704103b87033  -"UV-K5 V3 F4HWN LABS/README.md"
+          ZIP_APP_SHA="$(unzip -p "$ZIP" NUSA_DIGI_REV1D_30MIN_BEACON.app | sha256sum | cut -d " " -f 1)"
+          test "$ZIP_APP_SHA" = "10592e1469b54a38a68bfd94522fcdc22b14e6e349dec2ec1fec704103b87033"
           git fetch origin main
           HEAD_SHA="$(git rev-parse origin/main)"
           if gh release view "$TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
-            echo "Existing release found; preserving assets and download counters."
+            echo "Release exists; preserving downloads and uploading only missing assets."
             for ITEM in "$BIN" "$ZIP"; do
               BASENAME="${ITEM##*/}"
               if ! gh release view "$TAG" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$BASENAME"; then
                 gh release upload "$TAG" "$ITEM" --repo "$GH_REPO"
               fi
             done
+            gh release edit "$TAG" --repo "$GH_REPO" --draft=false
           else
-            gh release create "$TAG" "$BIN" "$ZIP" --repo "$GH_REPO" --target "$HEAD_SHA" --title "NUSA DIGI UV-K5 V3 F4HWN Labs REV1E — Same Callsign Auto Beacon" --notes-file "$NOTES"
+            gh release create "$TAG" "$BIN" "$ZIP" --repo "$GH_REPO" --target "$HEAD_SHA" --title "NUSA DIGI UV-K5 V3 F4HWN Labs REV1E — Same Callsign Auto Beacon" --notes-file "$NOTES" --latest=false
           fi
 
       - name: Verify release assets
@@ -143,23 +146,3 @@ jobs:
           test "$(gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets | length')" -eq 2
           gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin"
           gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "NUSA_DIGI_REV1D_30MIN_BEACON_APP.zip"
-
-          NOTES="UV-K5 V3 F4HWN LABS/README.md"
-          git fetch origin main
-          HEAD_SHA="$(git rev-parse origin/main)"
-          if gh release view "$TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
-            echo "Release already published; preserving download counters."
-            gh release view "$TAG" --repo "$GH_REPO" --json assets --jq '.assets[].name'
-          else
-            gh release create "$TAG" "$BIN" "$APP" --repo "$GH_REPO" --target "$HEAD_SHA" --title "NUSA DIGI UV-K5 V3 F4HWN Labs REV1E — Same Callsign Auto Beacon" --notes-file "$NOTES"
-          fi
-
-      - name: Verify release assets
-        env:
-          GH_TOKEN: ${{ steps.bot.outputs.token }}
-          GH_REPO: ${{ github.repository }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets[].name'
-          test "$(gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets | length')" -eq 2
