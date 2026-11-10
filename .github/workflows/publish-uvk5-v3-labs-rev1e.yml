@@ -1,0 +1,136 @@
+name: Publish NUSA UV-K5 V3 F4HWN Labs REV1E
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/publish-uvk5-v3-labs-rev1e.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate as stefendy-nusa GitHub App
+        id: bot
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.NUSA_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NUSA_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Check out project
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot.outputs.token }}
+          fetch-depth: 0
+
+      - name: Download exact tested Labs firmware and NUSA DIGI application
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIR="UV-K5 V3 F4HWN LABS"
+          mkdir -p "$DIR/firmware" "$DIR/apps"
+          curl -fLSs --retry 3 --max-time 60 "https://stefendy.com/downloads/F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin" -o "$DIR/firmware/F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin"
+          curl -fLSs --retry 3 --max-time 60 "https://stefendy.com/downloads/NUSA_DIGI_REV1D_30MIN_BEACON.app" -o "$DIR/apps/NUSA_DIGI_REV1D_30MIN_BEACON.app"
+          echo '041266862f650b50ef92a04df850a2500f77b0d1d7246d3c6c69c9cf34b96dc8  UV-K5 V3 F4HWN LABS/firmware/F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin' | sha256sum --check -
+          echo '10592e1469b54a38a68bfd94522fcdc22b14e6e349dec2ec1fec704103b87033  UV-K5 V3 F4HWN LABS/apps/NUSA_DIGI_REV1D_30MIN_BEACON.app' | sha256sum --check -
+
+      - name: Write UV-K5 V3 Labs project documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > "UV-K5 V3 F4HWN LABS/README.md" <<'DOC'
+          # NUSA DIGI — UV-K5 V3 F4HWN Labs v6.3.0
+
+          This firmware family is **for UV-K5 V3 with F4HWN Labs v6.3.0**, NOT for the UV-K5 V1 DIGI/iGATE builds in other folders.
+
+          ## Release pairing
+
+          - `firmware/F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin` — resident F4HWN Labs firmware REV1E
+          - `apps/NUSA_DIGI_REV1D_30MIN_BEACON.app` — NUSA DIGI overlay app REV1D
+
+          Both files are required. Their revision numbers differ because the resident same-callsign fix is in the REV1E main firmware; the REV1D app binary is unchanged.
+
+          ## Features
+
+          - APRS WIDEn-N/TRACEn-N digipeater with duplicate suppression
+          - Same digipeater and position-beacon identity (`YF9UAG-3` on the operator's test station)
+          - APRS position, symbol, PATH and comment from the APRS TX profile edited in APRS Edit
+          - 30-minute automatic position-beacon interval; press **3** for manual position beacon
+          - Auto Resume after power-on, plus hold EXIT on startup to bypass
+
+          ## Installation
+
+          1. Back up the currently working Labs firmware and app.
+          2. Flash the REV1E `.bin` with the correct UV-K5 V3 flashing method.
+          3. Install the REV1D `.app` with the compatible Labs App Loader.
+          4. Install/retain F4HWN APRS TX + APRS Edit, set the real location, symbol, PATH and comment, and use a permitted frequency.
+          5. Start NUSA DIGI, press **3** and verify the source callsign and coordinates with a second APRS receiver.
+
+          ## Checksums (SHA-256)
+
+          ```text
+          041266862f650b50ef92a04df850a2500f77b0d1d7246d3c6c69c9cf34b96dc8  F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin
+          10592e1469b54a38a68bfd94522fcdc22b14e6e349dec2ec1fec704103b87033  NUSA_DIGI_REV1D_30MIN_BEACON.app
+          ```
+
+          ## Testing status
+
+          The operator confirmed DIGI retransmission and a manual beacon with `YF9UAG-3` and APRS Edit position on the radio. Auto Resume was confirmed on earlier REV1C; the automatic 30-minute beacon and post-upgrade power-cycle on REV1E remain to be field-verified.
+
+          Never flash these binaries to UV-K5 V1 or other hardware variants. Keep a working rollback copy.
+          DOC
+
+      - name: Commit firmware and app to their dedicated GitHub folder
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          BOT_SLUG: ${{ steps.bot.outputs.app-slug }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          BOT_LOGIN="${BOT_SLUG}[bot]"
+          test "$BOT_LOGIN" = "stefendy-nusa[bot]"
+          BOT_ID="$(gh api "/users/${BOT_LOGIN}" --jq '.id')"
+          git config user.name "$BOT_LOGIN"
+          git config user.email "${BOT_ID}+${BOT_LOGIN}@users.noreply.github.com"
+          git add "UV-K5 V3 F4HWN LABS/"
+          if ! git diff --cached --quiet; then
+            git commit -m "release: add UV-K5 V3 Labs NUSA DIGI REV1E + REV1D app"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Publish GitHub Release with two binary assets
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="uvk5-v3-f4hwn-labs-rev1e"
+          BIN="UV-K5 V3 F4HWN LABS/firmware/F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin"
+          APP="UV-K5 V3 F4HWN LABS/apps/NUSA_DIGI_REV1D_30MIN_BEACON.app"
+          NOTES="UV-K5 V3 F4HWN LABS/README.md"
+          git fetch origin main
+          HEAD_SHA="$(git rev-parse origin/main)"
+          if gh release view "$TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
+            echo "Release already published; preserving download counters."
+            gh release view "$TAG" --repo "$GH_REPO" --json assets --jq '.assets[].name'
+          else
+            gh release create "$TAG" "$BIN" "$APP" --repo "$GH_REPO" --target "$HEAD_SHA" --title "NUSA DIGI UV-K5 V3 F4HWN Labs REV1E — Same Callsign Auto Beacon" --notes-file "$NOTES"
+          fi
+
+      - name: Verify release assets
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets[].name'
+          test "$(gh release view "uvk5-v3-f4hwn-labs-rev1e" --repo "$GH_REPO" --json assets --jq '.assets | length')" -eq 2
