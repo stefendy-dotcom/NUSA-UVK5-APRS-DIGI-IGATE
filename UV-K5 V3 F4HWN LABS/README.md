@@ -7,7 +7,7 @@ This firmware family is **for UV-K5 V3 with F4HWN Labs v6.3.0**, NOT for the UV-
 - `firmware/F4HWN_LABS_V630_NUSA_DIGI_SAME_CALL_REV1E.bin` — resident F4HWN Labs firmware REV1E
 - `apps/NUSA_DIGI_REV1D_30MIN_BEACON.app` — NUSA DIGI overlay app REV1D
 
-Both files are required. Their revision numbers differ because the resident same-callsign fix is in the REV1E main firmware; the REV1D app binary is unchanged.
+Both files are required. Their revision numbers differ because the resident same-callsign fix is in the REV1E main firmware; the REV1D app binary is unchanged. GitHub Release offers the APP in a ZIP because GitHub blocks uploading .app extensions as release assets. The raw .app remains in this repository.
 
 ## Features
 
