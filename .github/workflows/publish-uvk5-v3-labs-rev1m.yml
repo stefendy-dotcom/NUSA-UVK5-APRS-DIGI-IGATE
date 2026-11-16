@@ -1,0 +1,108 @@
+name: Publish NUSA DIGI REV1M — Automatic WIDE Paths
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/publish-uvk5-v3-labs-rev1m.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Authenticate NUSA GitHub release bot
+        id: bot
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.NUSA_APP_CLIENT_ID }}
+          private-key: ${{ secrets.NUSA_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot.outputs.token }}
+          fetch-depth: 0
+
+      - name: Fetch and verify field-tested REV1M APP and source
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIR="UV-K5 V3 F4HWN LABS"
+          APP="$DIR/apps/NUSA_DIGI_REV1M_AUTO_WIDE1_WIDE2_NO_MODE_REV1E.app"
+          SRC="$DIR/source/REV1M/aprsdigi_app.c"
+          BUILD="$DIR/source/REV1M/build.sh"
+          mkdir -p "$(dirname "$APP")" "$(dirname "$SRC")"
+          curl --fail --location --silent --show-error --retry 3 --max-time 60 "https://stefendy.com/downloads/NUSA_DIGI_REV1M_AUTO_WIDE1_WIDE2_NO_MODE_REV1E.app" -o "$APP"
+          curl --fail --location --silent --show-error --retry 3 --max-time 60 "https://stefendy.com/downloads/NUSA_DIGI_REV1M_SOURCE.c" -o "$SRC"
+          curl --fail --location --silent --show-error --retry 3 --max-time 60 "https://stefendy.com/downloads/NUSA_DIGI_REV1M_BUILD.sh" -o "$BUILD"
+          echo "9c4915c9e0a9cfa3225a2da9ce4d1d746c53f200d54643280d8b511287d8f490  $APP" | sha256sum -c -
+          echo "35c32f39c5c2dce9a0516456e0d8a1d583e346fcd0c7b5273a574986b6473089  $SRC" | sha256sum -c -
+          echo "cfff6db051680ba0dc1afdd26369d7ad24df3ef793e74bf2d616cf85aadda754  $BUILD" | sha256sum -c -
+          test "$(wc -c < "$APP")" -eq 4289
+
+      - name: Commit tested REV1M APP and source into repository
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          BOT_SLUG: ${{ steps.bot.outputs.app-slug }}
+        run: |
+          set -euo pipefail
+          LOGIN="${BOT_SLUG}[bot]"
+          BOT_ID="$(gh api "/users/${LOGIN}" --jq '.id')"
+          git config user.name "$LOGIN"
+          git config user.email "${BOT_ID}+${LOGIN}@users.noreply.github.com"
+          git add "UV-K5 V3 F4HWN LABS/apps/NUSA_DIGI_REV1M_AUTO_WIDE1_WIDE2_NO_MODE_REV1E.app" \
+                  "UV-K5 V3 F4HWN LABS/source/REV1M/aprsdigi_app.c" \
+                  "UV-K5 V3 F4HWN LABS/source/REV1M/build.sh"
+          if ! git diff --cached --quiet; then
+            git commit -m "release: publish field-tested NUSA DIGI REV1M app and source"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Publish REV1M GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          TAG="uvk5-v3-f4hwn-labs-nusa-digi-rev1m"
+          APP="UV-K5 V3 F4HWN LABS/apps/NUSA_DIGI_REV1M_AUTO_WIDE1_WIDE2_NO_MODE_REV1E.app"
+          NOTES="UV-K5 V3 F4HWN LABS/README_REV1M_ID_EN.md"
+          ZIP="NUSA_DIGI_REV1M_AUTO_WIDE1_WIDE2_APP.zip"
+          test -s "$NOTES"
+          zip -9 -j "$ZIP" "$APP"
+          unzip -p "$ZIP" NUSA_DIGI_REV1M_AUTO_WIDE1_WIDE2_NO_MODE_REV1E.app | sha256sum | grep -F "9c4915c9e0a9cfa3225a2da9ce4d1d746c53f200d54643280d8b511287d8f490"
+          git fetch origin main
+          TARGET="$(git rev-parse origin/main)"
+          if gh release view "$TAG" --repo "$GH_REPO" >/dev/null 2>&1; then
+            if ! gh release view "$TAG" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$ZIP"; then
+              gh release upload "$TAG" "$ZIP" --repo "$GH_REPO"
+            fi
+            gh release edit "$TAG" --repo "$GH_REPO" --notes-file "$NOTES" --draft=false
+          else
+            gh release create "$TAG" "$ZIP" --repo "$GH_REPO" --target "$TARGET" \
+              --title "NUSA DIGI REV1M — Auto WIDE1-1/WIDE2-1/WIDE2-2 (No Modes)" \
+              --notes-file "$NOTES" --latest=true
+          fi
+
+      - name: Verify Release asset and raw APP SHA256
+        shell: bash
+        env:
+          GH_TOKEN: ${{ steps.bot.outputs.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          TAG="uvk5-v3-f4hwn-labs-nusa-digi-rev1m"
+          ZIP="NUSA_DIGI_REV1M_AUTO_WIDE1_WIDE2_APP.zip"
+          gh release view "$TAG" --repo "$GH_REPO" --json assets --jq '.assets[].name' | grep -Fxq "$ZIP"
+          RAW="https://raw.githubusercontent.com/$GH_REPO/main/UV-K5%20V3%20F4HWN%20LABS/apps/NUSA_DIGI_REV1M_AUTO_WIDE1_WIDE2_NO_MODE_REV1E.app"
+          curl --fail --location --silent --show-error --retry 5 "$RAW" | sha256sum | grep -F "9c4915c9e0a9cfa3225a2da9ce4d1d746c53f200d54643280d8b511287d8f490"
+          echo "NUSA DIGI REV1M GitHub release verified"
